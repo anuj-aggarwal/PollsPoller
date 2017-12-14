@@ -1,21 +1,29 @@
-// Require Node Modules
+//--------------------
+//    NODE MODULES
+//--------------------
 const express = require("express");
 const path = require("path");
 const bp = require("body-parser");
-
-// Require User Files
-const CONFIG = require("./config");
-const models = require("./models");
+const cp = require("cookie-parser");
+const session = require("express-session");
 
 
 //--------------------
-//    Initialization
+//    User Files
+//--------------------
+const CONFIG = require("./config");
+const models = require("./models");
+const Passport = require("./passport");
+
+
+//--------------------
+//    INITIALIZATION
 //--------------------
 const app = express();
 
 
 //--------------------
-//   MiddleWares
+//    MIDDLEWARES
 //--------------------
 
 // Set View Engine
@@ -25,9 +33,38 @@ app.set("view engine", "ejs");
 app.use(bp.urlencoded({extended:true}));
 app.use(bp.json());
 
+// Use Cookie-Parser
+app.use(cp(CONFIG.COOKIE_SECRET_KEY));
+// Express-Session for Passport
+app.use(session({
+    secret: CONFIG.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true
+}));
+
+// Initialize Passport
+app.use(Passport.initialize());
+app.use(Passport.session());
+
+
 
 //--------------------
-//  Request Handlers
+//    HELPERS
+//--------------------
+
+function checkLoggedIn(req, res, next){
+    if(req.user)
+        next();
+    else{
+        console.log("Invalid Access!!");
+        res.redirect("/");
+    }
+}
+
+
+
+//--------------------
+//  REQUEST HANDLERS
 //--------------------
 
 // root Route
@@ -40,15 +77,21 @@ app.get("/loginsignup", (req, res)=>{
     res.render("loginsignup");
 });
 
-// Signup Request
+// Use passport Authenticate at Login POST Route
+app.post("/login", Passport.authenticate('local', {
+    successRedirect: "/",
+    failureRedirect: "/loginsignup"
+}));
+
+// Signup POST Request
 app.post("/signup", (req,res)=>{
     // Find the User if already exists
-    models.User.find({
+    models.User.findOne({
         username: req.body.username
     })
     .then((user)=>{
         // If user does not exists, create new User
-        if(user.length === 0)
+        if(user === null)
             return models.User.create({
                 username: req.body.username,
                 password: req.body.password,
@@ -71,7 +114,6 @@ app.post("/signup", (req,res)=>{
         res.redirect("/");
     });
 });
-
 
 
 // Listen at specified Port
