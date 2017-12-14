@@ -1,0 +1,19 @@
+{
+  "name": "pollspoller",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://Anuj05@bitbucket.org/pollspoller/pollspoller.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/pollspoller/pollspoller#readme",
+  "dependencies": {
+    "mongoose": "^4.13.7"
+  }
+}

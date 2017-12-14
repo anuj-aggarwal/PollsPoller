@@ -1,0 +1,34 @@
+user: {
+    username: String,
+    password: String,
+    name: String,
+    email: String,
+    pollsCreated: [poll_id]
+}
+
+poll: {
+    author: user_id,
+    question: String,
+    options: [{
+        body: String,
+        votes: Number
+    }],
+    voters: [user_id],
+    discussion: discussion_id,
+    category: String,
+    pollType: String,
+    isOpen: Boolean
+}
+
+discussion: {
+    poll: poll_id,
+    posts: [{
+        sender: user_id,
+        body: String,
+        replies: [{
+            sender: user_id,
+            body: String
+        }]
+    }],
+    isOpen: Boolean
+}
