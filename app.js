@@ -62,10 +62,16 @@ function checkLoggedIn(req, res, next){
 }
 
 
+// Serve static files
+app.use('/', express.static(path.join(__dirname, 'public_static')));
 
 //--------------------
 //  REQUEST HANDLERS
 //--------------------
+
+// Routers
+app.use('/polls', require('./routes/poll'));
+
 
 // root Route
 app.get("/", (req,res)=>{

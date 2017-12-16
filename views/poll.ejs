@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+<body>
+
+<!-- Poll Question and Author -->
+<h2><%= poll.question %></h2>
+By- <%= poll.author %>
+
+<!-- Options Display -->
+<ol>
+    <% poll.options.forEach((option)=>{ %>
+        <li><%= option.body %></li>
+    <% }); %>
+</ol>
+
+<!-- Number of Voters -->
+Nūṁber of votes: <%= poll.voters.length %>
+
+<!-- Discussion id -->
+<p>Discussion: <%= poll.discussion %></p>
+
+</body>
+</html>
