@@ -20,8 +20,12 @@ By- <%= poll.author %>
 <!-- Number of Voters -->
 Nūṁber of votes: <%= poll.voters.length %>
 
-<!-- Discussion id -->
-<p>Discussion: <%= poll.discussion %></p>
+<!-- Replies' IDs -->
+<ul>
+    <% poll.replies.forEach((reply)=>{ %>
+    <li><%= reply._id %></li>
+    <% }); %>
+</ul>
 
 </body>
 </html>

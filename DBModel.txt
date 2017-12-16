@@ -14,21 +14,15 @@ poll: {
         votes: Number
     }],
     voters: [user_id],
-    discussion: discussion_id,
+    replies: [reply_id],
     category: String,
     pollType: String,
-    isOpen: Boolean
+    isPollOpen: Boolean,
+    isDiscussionOpen: Boolean
 }
 
-discussion: {
-    poll: poll_id,
-    posts: [{
-        sender: user_id,
-        body: String,
-        replies: [{
-            sender: user_id,
-            body: String
-        }]
-    }],
-    isOpen: Boolean
+reply: {
+   sender: user_id,
+   body: String,
+   replies: [reply_id]
 }

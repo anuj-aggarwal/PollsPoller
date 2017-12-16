@@ -15,9 +15,9 @@ route.get('/new', (req,res)=>{
 });
 
 
-// POST Route for Creating new Event
+// POST Route for Creating new Poll
 route.post('/', (req,res)=>{
-    // Create a new Event
+    // Create a new Poll
     models.Poll.create({
         author: req.user._id,
         question: req.body.question,
@@ -28,29 +28,18 @@ route.post('/', (req,res)=>{
                 votes: 0
             };
         }),
-        isOpen: true
+        isPollOpen: true,
+        isDiscussionOpen: true
     })
-    .then((poll) => {
-        // If successful, create a discussion page for the Event
-        models.Discussion.create({
-            poll: poll._id,
-            isOpen: true
-        })
-        .then((discussion)=>{
-            // Update the Poll with the new Discussion Id
-            poll.discussion = discussion._id;
-            return poll.save();
-        })
-        .then((poll)=>{
-            // Send the new Poll's Address to the User
-            res.send(`/polls/${poll._id}`);
-        })
+    .then((poll)=>{
+        // Send the new Poll's Address to the User
+        res.send(`/polls/${poll._id}`);
     })
-    .catch((err) => {
-        // If error, log it, and redirect on the Same Page
+    .catch((err)=>{
+        // If error, redirect on the Same Page
         console.log(`Error! ${err}`);
         res.send('/polls/new');
-    })
+    });
 });
 
 

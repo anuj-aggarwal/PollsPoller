@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 // Require DB Models
 const User = require("./user");
 const Poll = require("./poll");
-const Discussion = require("./discussion");
+const Reply = require("./reply");
 
 // Require config.js file
 const CONFIG = require("../config");
@@ -27,4 +27,4 @@ mongoose.connect(`mongodb://${CONFIG.DB.HOST}:${CONFIG.DB.PORT}/${CONFIG.DB.NAME
 
 
 // Export all the Models
-module.exports = {User, Poll, Discussion};
+module.exports = {User, Poll, Reply};

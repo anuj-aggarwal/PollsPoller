@@ -16,13 +16,14 @@ const pollSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "user"
     }],
-    discussion: {
+    replies: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: "discussion"
-    },
+        ref: "reply"
+    }],
     category: String,
     pollType: String,
-    isOpen: Boolean
+    isPollOpen: Boolean,
+    isDiscussionOpen: Boolean
 });
 
 // Export Poll Model
