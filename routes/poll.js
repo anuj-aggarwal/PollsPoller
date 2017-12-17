@@ -28,6 +28,7 @@ route.post('/', (req,res)=>{
                 votes: 0
             };
         }),
+        voteCount: 0,
         isPollOpen: true,
         isDiscussionOpen: true
     })

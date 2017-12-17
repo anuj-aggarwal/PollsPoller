@@ -12,10 +12,16 @@ const pollSchema = mongoose.Schema({
         body: String,
         votes: Number
     }],
-    voters: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "user"
+    votes: [{
+        voter:{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "user"
+        },
+        option: {
+            type: mongoose.Schema.Types.ObjectId
+        }
     }],
+    voteCount: Number,
     replies: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "reply"

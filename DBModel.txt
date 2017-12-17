@@ -13,7 +13,11 @@ poll: {
         body: String,
         votes: Number
     }],
-    voters: [user_id],
+    votes: [{
+        voter: user_id,
+        option: option_id
+    }],
+    voteCount: Number,
     replies: [reply_id],
     category: String,
     pollType: String,
