@@ -12,6 +12,8 @@ const replySchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "reply"
     }]
+}, {
+    usePushEach: true   // Use Mongo $pushEach instead of deprecated $pushAll
 });
 
 // Export Reply Model

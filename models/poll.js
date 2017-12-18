@@ -30,6 +30,8 @@ const pollSchema = mongoose.Schema({
     pollType: String,
     isPollOpen: Boolean,
     isDiscussionOpen: Boolean
+}, {
+    usePushEach: true   // Use Mongo $pushEach instead of deprecated $pushAll
 });
 
 // Export Poll Model

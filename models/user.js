@@ -11,6 +11,8 @@ const UserSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "poll"
     }]
+}, {
+    usePushEach: true   // Use Mongo $pushEach instead of deprecated $pushAll
 });
 
 // Export User Model
