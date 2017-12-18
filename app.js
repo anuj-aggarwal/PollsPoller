@@ -71,6 +71,7 @@ app.use('/', express.static(path.join(__dirname, 'public_static')));
 
 // Routers
 app.use('/polls', require('./routes/poll'));
+app.use('/discussions', require('./routes/discussion'));
 
 
 // root Route

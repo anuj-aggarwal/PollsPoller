@@ -10,22 +10,24 @@
 <h2><%= poll.question %></h2>
 By- <%= poll.author %>
 
-<!-- Options Display -->
-<ol>
-    <% poll.options.forEach((option)=>{ %>
-        <li><%= option.body %></li>
-    <% }); %>
-</ol>
+<form action="/polls/<%= poll._id %>/votes" method="post">
+    <!-- Options Display -->
+    <ol>
+        <% poll.options.forEach((option)=>{ %>
+        <li>
+            <input type="radio" name="option" value="<%= option._id %>" required>
+            <%= option.body %>
+        </li>
+        <% }); %>
+    </ol>
+    <button>Vote</button>
+</form>
 
 <!-- Number of Voters -->
 Nūṁber of votes: <%= poll.voteCount %>
 
-<!-- Replies' IDs -->
-<ul>
-    <% poll.replies.forEach((reply)=>{ %>
-    <li><%= reply._id %></li>
-    <% }); %>
-</ul>
+<!-- Show link to Discussion -->
+<a href="/discussions/<%= poll._id %>">Discussion Page</a>
 
 </body>
 </html>

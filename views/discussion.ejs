@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Discussion</title>
+</head>
+<body>
+
+<!-- Poll Question -->
+<h2><%= poll.question %></h2>
+
+<!-- Form for Replying -->
+<form action="/discussions/<%= poll._id %>/replies/" method="post">
+    <input type="text" name="body">
+    <button>Reply</button>
+</form>
+
+<!-- Ids of Each reply -->
+<% poll.replies.forEach((reply)=>{ %>
+    <p><%= reply._id %></p>
+<% }) %>
+
+
+</body>
+</html>
