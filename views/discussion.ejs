@@ -15,10 +15,13 @@
     <button>Reply</button>
 </form>
 
-<!-- Ids of Each reply -->
-<% poll.replies.forEach((reply)=>{ %>
-    <p><%= reply._id %></p>
-<% }) %>
+<!--Replies Container-->
+<ul>
+    <!-- Ids of Each reply -->
+    <% poll.replies.forEach((reply)=>{ %>
+        <li><%= reply %></li>
+    <% }) %>
+</ul>
 
 
 </body>
