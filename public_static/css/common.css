@@ -1,0 +1,25 @@
+/* Import required Fonts */
+@import url('https://fonts.googleapis.com/css?family=Oleo+Script+Swash+Caps:400,700');
+
+
+/********************
+       NAVBAR
+********************/
+/* Adjust Logo Height */
+#navbar-logo {
+    width: 50px;
+}
+
+/* PollsPoller */
+#brand-name {
+    font-size: 30px;
+    color: #fd573f;
+    font-family: 'Oleo Script Swash Caps', cursive;
+    padding: 15px 10px;
+    box-shadow: none;
+}
+
+/* Font Size in Menu */
+#navbar-menu {
+    font-size: 17px;
+}
