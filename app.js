@@ -95,6 +95,12 @@ app.post("/login", Passport.authenticate('local', {
     failureRedirect: "/loginsignup"
 }));
 
+// Get Route for Logging Out
+app.get('/logout', (req,res)=>{
+    req.logout();
+    res.redirect('/');
+});
+
 // Signup POST Request
 app.post("/signup", (req,res)=>{
     // Find the User if already exists
