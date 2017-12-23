@@ -47,9 +47,10 @@ route.post('/', (req,res)=>{
 // GET Route for Single Poll
 route.get('/:id', (req, res)=>{
     // Find the Poll with specified id in params
-    models.Poll.findById(req.params.id)
+    models.Poll.findById(req.params.id).populate('author')
     .then((poll)=>{
         // If found, Render the Poll Page
+        console.log(poll);
         res.render('poll', {poll});
     })
     .catch((err)=>{

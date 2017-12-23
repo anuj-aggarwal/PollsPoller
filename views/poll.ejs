@@ -5,6 +5,8 @@
     <title>Document</title>
 
     <% include ./partials/header.ejs %>
+    <link rel="stylesheet" href="/css/poll.css">
+    <script src="/js/poll.js"></script>
 
 </head>
 <body>
@@ -12,28 +14,39 @@
 <!-- NAVBAR -->
 <% include ./partials/navbar.ejs %>
 
-<!-- Poll Question and Author -->
-<h2><%= poll.question %></h2>
-By- <%= poll.author %>
+<div id="poll-container" class="ui container">
+    <!-- Question and Author -->
+    <h2 class="header"><%= poll.question %></h2>
+    <p>By~ <%= poll.author.username %></p>
 
-<form action="/polls/<%= poll._id %>/votes" method="post">
-    <!-- Options Display -->
-    <ol>
-        <% poll.options.forEach((option)=>{ %>
-        <li>
-            <input type="radio" name="option" value="<%= option._id %>" required>
-            <%= option.body %>
-        </li>
-        <% }); %>
-    </ol>
-    <button>Vote</button>
-</form>
+    <!-- Vote Form with Options -->
+    <form action="/polls/<%= poll._id %>/votes" method="post" class="ui form">
+        <!-- Options List -->
+        <div class="ui segment">
+            <div id="options" class="ui relaxed divided list">
+                <% poll.options.forEach((option)=>{ %>
+                    <div class="item">
+                        <div class="ui radio checkbox">
+                            <input type="radio" name="option" value="<%= option._id %>" required>
+                            <label class="option-body">
+                                <%= option.body %>
+                            </label>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+        </div>
 
-<!-- Number of Voters -->
-Nūṁber of votes: <%= poll.voteCount %>
+        <!-- Vote Button -->
+        <button class="ui blue label">
+            Vote
+            <div class="detail"><%= poll.voteCount %></div>
+        </button>
+    </form>
 
-<!-- Show link to Discussion -->
-<a href="/discussions/<%= poll._id %>">Discussion Page</a>
+    <!-- Link to Discussion -->
+    <h3><a href="/discussions/<%= poll._id %>" class="ui button">Join the Discussion</a></h3>
+</div>
 
 </body>
 </html>

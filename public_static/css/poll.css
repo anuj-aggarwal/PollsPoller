@@ -1,0 +1,12 @@
+#poll-container {
+    max-width: 800px !important;
+}
+
+.header {
+    overflow-wrap: break-word;
+}
+
+.option-body {
+    max-width: 60vw;
+    overflow-wrap: break-word;
+}
