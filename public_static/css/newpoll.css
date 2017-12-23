@@ -1,0 +1,8 @@
+#poll-container {
+    max-width: 500px !important;
+}
+
+/* Wrap if option text overflows */
+.option {
+    overflow-wrap: break-word;
+}

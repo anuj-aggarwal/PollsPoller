@@ -20,7 +20,12 @@ $(() => {
     addOptionBtn.click(() => {
         if (optionInput.val().trim() !== "") {
             optionList.append(`
-                <li>${optionInput.val().trim()}</li>
+                <div class="item">
+                    <div class="ui grid">
+                        <div class="option fourteen wide column">${optionInput.val().trim()}</div>
+                        <div class="two wide column"><i class="ui remove icon"></i></div>
+                    </div>
+                </div>
             `);
         }
 

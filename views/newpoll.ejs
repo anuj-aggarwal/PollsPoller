@@ -6,7 +6,7 @@
     <title>Create Poll | PollsPoller</title>
 
     <% include ./partials/header.ejs %>
-
+    <link rel="stylesheet" href="/css/newpoll.css">
     <script src="/js/newpoll.js"></script>
 </head>
 <body>
@@ -14,19 +14,38 @@
 <!-- NAVBAR -->
 <% include ./partials/navbar.ejs %>
 
-<section id="page">
-    <!-- Question Input -->
-    <input id="question" type="text" name="question" placeholder="Enter your Poll Question:">
+<section>
+    <!-- Main Poll Container -->
+    <div id="poll-container" class="ui container">
+        <h1 class="header">Create New Poll</h1>
+        <div class="ui form">
+            <!-- Question Input -->
+            <div class="field">
+                <input id="question" type="text" name="question" placeholder="Enter your Poll Question:">
+            </div>
 
-    <!-- Add new option Form -->
-    <input id="new-option" type="text" placeholder="New Option">
-    <button id="add-option-btn">+</button>
+            <!-- Add new option -->
+            <div class="inline fields">
+                <div class="fourteen wide field">
+                    <input id="new-option" type="text" placeholder="New Option">
+                </div>
+                <div class="two wide field">
+                    <button id="add-option-btn" class="ui button">+</button>
+                </div>
+            </div>
 
-    <!-- Display options List -->
-    <ol id="options"></ol>
+            <!-- Options List -->
+            <div class="ui segment">
+                <div id="options" class="ui relaxed divided list">
+                    <!-- Options to be added by JS -->
+                </div>
+            </div>
 
-    <!-- Create Poll Button -->
-    <button id="create-poll-btn">Create Poll</button>
+            <!-- Create Poll Button -->
+            <button id="create-poll-btn" class="ui primary button">Create Poll</button>
+        </div>
+
+    </div>
 
 </section>
 
