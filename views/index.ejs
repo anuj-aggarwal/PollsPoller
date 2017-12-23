@@ -4,19 +4,7 @@
 	<meta charset="UTF-8">
 	<title>Polls Poller</title>
 
-	<!-- CSS -->
-	<!-- Semantic UI -->
-	<link rel="stylesheet" href="/lib/semantic/semantic.min.css">
-	<!-- Custom CSS -->
-	<link rel="stylesheet" href="/css/common.css">
-
-	<!-- JS Files -->
-	<!-- jQuery -->
-	<script src="/lib/jquery.js"></script>
-	<!-- Semantic UI -->
-	<script src="/lib/semantic/semantic.min.js"></script>
-	<!-- Common JS -->
-	<script src="/js/common.js"></script>
+    <% include ./partials/header.ejs %>
 
 </head>
 <body>
@@ -24,11 +12,16 @@
 <!-- NAVBAR -->
 <% include ./partials/navbar.ejs %>
 
-Polls Poller
-<!-- Login/Signup Button -->
-<a href="/loginsignup">Login | Signup</a>
-<!-- Create Poll Button -->
-<a href="/polls/new">Create new Poll</a>
+<!-- Landing Section -->
+<div id="front-section" class="ui inverted segment">
+	<div class="ui text container">
+		<h1 id="page-heading" class="ui inverted">
+			Polls Poller
+		</h1>
+		<h2>Vote your Opinion</h2>
+		<a href="#" class="ui huge primary button">Get Started &nbsp;<i class="chevron down arrow icon"></i></a>
+	</div>
+</div>
 
 </body>
 </html>

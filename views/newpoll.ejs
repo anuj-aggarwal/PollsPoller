@@ -5,8 +5,8 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Create Poll | PollsPoller</title>
 
-    <!-- Include jQuery and Custom JS -->
-    <script src="/lib/jquery.js"></script>
+    <% include ./partials/header.ejs %>
+
     <script src="/js/newpoll.js"></script>
 </head>
 <body>
@@ -14,18 +14,21 @@
 <!-- NAVBAR -->
 <% include ./partials/navbar.ejs %>
 
-<!-- Question Input -->
-<input id="question" type="text" name="question" placeholder="Enter your Poll Question:">
+<section id="page">
+    <!-- Question Input -->
+    <input id="question" type="text" name="question" placeholder="Enter your Poll Question:">
 
-<!-- Add new option Form -->
-<input id="new-option" type="text" placeholder="New Option">
-<button id="add-option-btn">+</button>
+    <!-- Add new option Form -->
+    <input id="new-option" type="text" placeholder="New Option">
+    <button id="add-option-btn">+</button>
 
-<!-- Display options List -->
-<ol id="options"></ol>
+    <!-- Display options List -->
+    <ol id="options"></ol>
 
-<!-- Create Poll Button -->
-<button id="create-poll-btn">Create Poll</button>
+    <!-- Create Poll Button -->
+    <button id="create-poll-btn">Create Poll</button>
+
+</section>
 
 </body>
 </html>

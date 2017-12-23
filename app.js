@@ -69,6 +69,11 @@ app.use('/', express.static(path.join(__dirname, 'public_static')));
 //  REQUEST HANDLERS
 //--------------------
 
+app.use(function(req, res, next) {
+    res.locals.user = req.user;
+    next();
+});
+
 // Routers
 app.use('/polls', require('./routes/poll'));
 app.use('/discussions', require('./routes/discussion'));

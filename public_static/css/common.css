@@ -12,7 +12,7 @@
 
 /* PollsPoller */
 #brand-name {
-    font-size: 30px;
+    font-size: 2.0em;
     color: #fd573f;
     font-family: 'Oleo Script Swash Caps', cursive;
     padding: 15px 10px;
@@ -21,5 +21,24 @@
 
 /* Font Size in Menu */
 #navbar-menu {
-    font-size: 17px;
+    font-size: 1.2em;
+}
+
+/* Give Padding to anything that is after Navbar */
+#navbar + * {
+    padding-top: 2.0em;
+}
+
+/* Landing Section */
+#front-section {
+    height: 100vh;
+    text-align: center;
+    color: white;
+    padding-top: 30vh;
+}
+
+/* Heading of Landing Section */
+#page-heading {
+    font-family: 'Oleo Script Swash Caps', cursive;
+    font-size: 6.5em;
 }

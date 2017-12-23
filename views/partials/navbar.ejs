@@ -21,7 +21,22 @@
                 </div>
             </div>
             <!-- Login/Signup Dropdown -->
-            <a class="item">Login/Signup</a>
+            <!-- Display Login/Signup if user not Logged in -->
+            <% if(!user) { %>
+                <a href="/loginsignup" class="item">Login/Signup</a>
+            <% } else {%>
+            <!-- If logged in, display the Welcome dropdown -->
+                <div class="ui dropdown link item">
+                    <span class="text">Welcome <%= user.username %></span>
+                    <i class="dropdown icon"></i>
+                    <div class="menu">
+                        <a class="item">Your Polls</a>
+                        <a href="/polls/new" class="item">Create New Poll</a>
+                        <a class="item">Profile</a>
+                        <a class="item">Logout</a>
+                    </div>
+                </div>
+            <% } %>
         </div>
     </div>
 </div>
