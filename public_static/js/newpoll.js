@@ -5,6 +5,7 @@ $(() => {
     const addOptionBtn = $('#add-option-btn');
     const createPollBtn = $('#create-poll-btn');
     const optionInput = $('#new-option');
+    const options = $('.option');
 
     //--------------------
     //   EVENT LISTENERS
@@ -39,7 +40,7 @@ $(() => {
         $.post('/polls', {
             question: $('#question').val(),
             // Extract the options' texts from the Input List
-            options: optionList.children().toArray().map((option) => {
+            options: $('.option').toArray().map((option) => {
                 return $(option).text();
             })
         })
