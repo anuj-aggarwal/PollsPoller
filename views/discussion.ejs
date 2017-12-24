@@ -4,8 +4,12 @@
     <meta charset="UTF-8">
     <title>Discussion</title>
 
+    <!-- Include Required Common StyleSheets and Scripts -->
     <% include ./partials/header.ejs %>
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="/css/discussion.css">
+    <!-- Custom JS -->
+    <script src="/js/discussion.js"></script>
 
 </head>
 <body>
@@ -15,96 +19,31 @@
 
 <!-- Main Container -->
 <div class="ui container">
-    <div class="ui large threaded comments">
+    <!-- data-id stores id of poll -->
+    <div data-poll-id="<%= poll._id %>" id="outer-replies" class="ui large threaded comments">
         <!-- Poll Question -->
         <h1 id="question" class="ui dividing header"><%= poll.question %></h1>
-        <!-- Comment 1 -->
-        <div class="comment">
-            <!-- Avatar -->
-            <a class="avatar">
-                <img src="/img/christian.jpg">
-            </a>
-            <div class="content">
-                <!-- Username -->
-                <a class="author">Matt</a>
-                <!-- Text -->
-                <div class="text">
-                    How artistic!
-                </div>
-                <!-- Reply Button -->
-                <div class="actions">
-                    <a class="reply">Replies (25)</a>
-                </div>
-            </div>
-        </div>
-        <!-- Comment 2 -->
-        <div class="comment">
-            <a class="avatar">
-                <img src="/img/christian.jpg">
-            </a>
-            <div class="content">
-                <a class="author">Elliot Fu</a>
-                <div class="text">
-                    <p>This has been very useful for my research. Thanks as well!</p>
-                </div>
-                <div class="actions">
-                    <a class="reply">Replies (25)</a>
-                </div>
-            </div>
-            <div class="comments">
-                <!-- Comment 2.1 -->
-                <div class="comment">
-                    <a class="avatar">
-                        <img src="/img/christian.jpg">
-                    </a>
-                    <div class="content">
-                        <a class="author">Jenny Hess</a>
-                        <div class="text">
-                            Elliot you are always so right :)
-                        </div>
-                        <div class="actions">
-                            <a class="reply">Replies (25)</a>
-                        </div>
-                    </div>
 
-                </div>
-                <!-- Reply Form 2.1 -->
-                <form class="ui form reply-form">
-                    <div class="field">
-                        <textarea rows="2"></textarea>
-                    </div>
-                    <div class="ui blue labeled submit icon button">
-                        <i class="icon edit"></i> Add Reply
-                    </div>
-                </form>
-            </div>
+        <!-- Comments -->
+        <div id="outer-comments-box" class="replies-box">
+            <!-- Individual Comments to be added by JS -->
         </div>
-        <!-- Comment 3 -->
-        <div class="comment">
-            <a class="avatar">
-                <img src="/img/christian.jpg">
-            </a>
-            <div class="content">
-                <a class="author">Joe Henderson</a>
-                <div class="text">
-                    Dude, this is awesome. Thanks so much
-                </div>
-                <div class="actions">
-                    <a class="reply">Replies (25)</a>
-                </div>
-            </div>
-        </div>
-        <!-- Reply Form 1 -->
+
+
+        <!-- Outermost Reply Form -->
         <form class="ui form reply-form">
+            <!-- TextArea -->
             <div class="field">
-                <textarea rows="2"></textarea>
+                <textarea class="outer-reply-text" rows="2"></textarea>
             </div>
-            <div class="ui blue labeled submit icon button">
+            <!-- Reply Button -->
+            <div class="ui blue labeled submit icon button outer-reply-button">
                 <i class="icon edit"></i> Add Reply
             </div>
         </form>
     </div>
 </div>
+<!-- END Main Container -->
 
 </body>
 </html>
