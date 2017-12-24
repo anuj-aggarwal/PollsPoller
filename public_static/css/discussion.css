@@ -1,0 +1,11 @@
+#question {
+    padding-top: 20px;
+}
+
+.reply-form {
+    margin-top: 10px;
+}
+
+.ui.comments {
+    max-width: 100%;
+}
