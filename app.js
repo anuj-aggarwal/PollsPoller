@@ -77,7 +77,7 @@ app.use(function(req, res, next) {
 // Routers
 app.use('/polls', require('./routes/poll'));
 app.use('/discussions', require('./routes/discussion'));
-
+app.use('/replies', require('./routes/reply'));
 
 // root Route
 app.get("/", (req,res)=>{

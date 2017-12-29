@@ -13,8 +13,8 @@ $(() => {
     updateReplies(pollId, outerCommentsBox);
 
     /********************
-    *  Event Listeners  *
-    *********************/
+     *  Event Listeners  *
+     *********************/
 
     // Make new AJAX Request to Reply on clicking Reply Button
     outerReplyButton.click(() => {
@@ -27,7 +27,7 @@ $(() => {
 
 
 // Function to Append a single Reply to Outermost Comments Box
-function appendReply(outerCommentsBox, reply){
+function appendReply(outerCommentsBox, reply) {
     outerCommentsBox.append(`
             <div data-reply-id="${reply._id}" class="comment">
                 <!-- Avatar -->
@@ -46,8 +46,33 @@ function appendReply(outerCommentsBox, reply){
                         <a class="reply">Replies (${reply.replies.length})</a>
                     </div>
                 </div>
+                
+                <!-- Comments -->
+                <div class="comments">
+                    <div class="replies">
+                        <!-- Comments to be added on page load/ new reply -->
+                    </div>
+                </div>
             </div>
         `);
+
+    // Current reply
+    let comment = $(`[data-reply-id="${reply._id}"]`);
+    // Comments COntainer for the reply
+    let comments = comment.children('.comments');
+
+    // Get the Replies of current Reply
+    $.get(`/replies/${reply._id}/replies`)
+        .then((replies) => {
+                // Append each reply to replies container
+                replies.forEach((innerReply) => {
+                    appendReply(comments.children('.replies'), innerReply)
+                });
+                appendReplyForm(comments, reply._id);
+            })
+        .catch((err) => {
+            console.log(err);
+        })
 }
 
 // Function to update all replies in comments Box with replies
@@ -63,22 +88,22 @@ function showReplies(outerCommentsBox, replies) {
 
 // Function to Load Replies from Server through AJAX Request
 // and updates the CommentsBox
-// uses showReplies()
+// uses showReplies()Container, innerReply);
 function updateReplies(pollId, outerCommentsBox) {
     // Make AJAX Request to Server
     $.get(`/discussions/${pollId}/replies`)
-    .then((replies) => {
-        // If Error not undefined, throw the Error to be catched in catch statement
-        if(replies.err)
-            throw new Error(replies.err);
+        .then((replies) => {
+            // If Error not undefined, throw the Error to be catched in catch statement
+            if (replies.err)
+                throw new Error(replies.err);
 
-        // update the DOM if no error
-        showReplies(outerCommentsBox, replies);
-    })
-    .catch((err) => {
-        // Log the Error if present
-        console.log("Error Extracting Replies");
-    });
+            // update the DOM if no error
+            showReplies(outerCommentsBox, replies);
+        })
+        .catch((err) => {
+            // Log the Error if present
+            console.log("Error Extracting Replies");
+        });
 }
 
 // function to Make a POST AJAX request to Server to make a reply
@@ -88,16 +113,56 @@ function reply(pollId, outerCommentsBox, outerReplyTextArea) {
     $.post(`/discussions/${pollId}/replies`, {
         body: outerReplyTextArea.val()
     })
-    .then((reply) => {
-        // If error present, throw it to be catched by outer catch statement
-        if(reply.err)
-            throw new Error(reply.err);
+        .then((reply) => {
+            // If error present, throw it to be catched by outer catch statement
+            if (reply.err)
+                throw new Error(reply.err);
 
-        // Append the new Reply to Comments Box
-        appendReply(outerCommentsBox, reply);
-    })
-    .catch((err) => {
-        // Log the Error if present
-        console.log(err);
-    })
+            // Append the new Reply to Comments Box
+            appendReply(outerCommentsBox, reply);
+        })
+        .catch((err) => {
+            // Log the Error if present
+            console.log(err);
+        })
+}
+
+
+// Function to append the Reply Form at the end of Comments Container of a Reply
+function appendReplyForm(comments, replyId) {
+    comments.append(`
+         <!-- Outermost Reply Form -->
+        <form class="ui form reply-form">
+            <!-- TextArea -->
+            <div class="field">
+                <textarea class="outer-reply-text" rows="2"></textarea>
+            </div>
+            <!-- Reply Button -->
+            <div class="ui blue labeled submit icon button outer-reply-button">
+                <i class="icon edit"></i> Add Reply
+            </div>
+        </form>
+    `);
+
+
+    // EVENT LISTENERS
+    let form = comments.children('.form');
+    let formButton = form.children('.submit.button');
+    let formTextArea = form.children('.field').children('textarea');
+
+    // Form Reply Button
+    formButton.click(() => {
+        let replyText = formTextArea.val().trim();
+        $.post(`/replies/${replyId}/replies`, {
+            body: replyText
+        })
+        .then((reply) => {
+            appendReply(comments.children('.replies'), reply);
+        })
+        .catch((err) => {
+            console.log(err);
+        });
+        formTextArea.val('');
+    });
+
 }
