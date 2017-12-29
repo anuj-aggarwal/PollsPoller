@@ -102,7 +102,7 @@ app.get('/logout', (req,res)=>{
 });
 
 // Signup POST Request
-app.post("/signup", (req,res)=>{
+app.post("/signup", (req,res, next)=>{
     // Find the User if already exists
     models.User.findOne({
         username: req.body.username
@@ -124,7 +124,13 @@ app.post("/signup", (req,res)=>{
         // Redirect to Login/SignUp Page
         console.log("User created: ");
         console.log(user);
-        res.redirect("/loginsignup");
+
+        // Log the current user in
+        Passport.authenticate('local', {
+            successRedirect: "/",
+            failureRedirect: "/loginsignup"
+        })(req,res, next);
+
     })
     .catch((err)=>{
         // Redirect to Home Page
