@@ -11,13 +11,43 @@ const models = require('../models');
 
 // GET Route for all polls Page
 route.get('/show', (req,res)=>{
-    res.render('polls');
+    // Check sorting method and render polls.ejs accordingly
+    if(req.query.sort) {
+        res.render('polls', {
+            sortBy: req.query.sort
+        });
+    }
+    else {
+        res.render('polls', {
+            sortBy: "default"
+        });
+    }
 });
 
 // GET Route for all polls
 route.get('/', (req,res)=>{
+    // Decide method for sorting(trending/recent/default)
+    // from query parameter "sort"
+    let sortBy;
+    switch(req.query.sort) {
+        case "recent":
+            // recent sorted by last created
+            sortBy = "createdAt";
+            break;
+        case "trending":
+            // trending sorted by number of votes
+            sortBy = "voteCount";
+            break;
+        case "default":
+            // Default sorting by last updated
+            sortBy = "updatedAt";
+            break;
+    }
+
     // Get all the polls with question, author and voteCount only
     models.Poll.find({}, 'question author voteCount')
+        // Sort the polls according to sorting method
+        .sort({[sortBy]: 'descending'})
         // Populate the username of the author
         .populate('author', 'username')
         .then((polls)=>{

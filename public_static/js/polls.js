@@ -1,17 +1,20 @@
 $(() => {
     const pollsContainer = $('#polls-container');
 
+    // Get sorting method from polls Container
+    let sortBy = pollsContainer.data('sort');
+
     // Load the polls from Server and update the DOM with the loaded polls
-    loadPolls(pollsContainer);
+    loadPolls(pollsContainer, sortBy);
 });
 
 
 // Function to load polls from server
 // and update the Polls Container with the polls
 // Use appendPolls()
-function loadPolls(pollsContainer) {
-    // Get all polls from the Server
-    $.get('/polls')
+function loadPolls(pollsContainer, sortBy) {
+    // Get all polls from the Server sorted by sortBy
+    $.get(`/polls?sort=${sortBy}`)
         .then((polls) => {
             // Append the polls to the Polls Container
             appendPolls(pollsContainer, polls);

@@ -31,7 +31,8 @@ const pollSchema = mongoose.Schema({
     isPollOpen: Boolean,
     isDiscussionOpen: Boolean
 }, {
-    usePushEach: true   // Use Mongo $pushEach instead of deprecated $pushAll
+    usePushEach: true,  // Use Mongo $pushEach instead of deprecated $pushAll
+    timestamps: {createdAt: "createdAt"}    // adds createdAt and updatedAt timestamps for sorting
 });
 
 // Export Poll Model
