@@ -8,7 +8,6 @@ $(() => {
     // Outermost Reply Form's Reply Button
     const outerReplyButton = $('.outer-reply-button');
 
-
     // Initialize Comments on Page Load
     updateReplies(pollId, outerCommentsBox);
 
@@ -18,15 +17,19 @@ $(() => {
 
     // Make new AJAX Request to Reply on clicking Reply Button
     outerReplyButton.click(() => {
-        // make reply, and append it
-        reply(pollId, outerCommentsBox, outerReplyTextArea);
-        // Clear the Text Area's Value
-        outerReplyTextArea.val('');
+        // Get the reply text
+        let replyText = outerReplyTextArea.val().trim();
+        if (replyText !== "") {
+            // make reply, and append it
+            reply(pollId, outerCommentsBox, replyText);
+            // Clear the Text Area's Value
+            outerReplyTextArea.val('');
+        }
     });
 });
 
 
-// Function to Append a single Reply to Outermost Comments Box
+// Function to Append a single Reply to Outer Comments Box of current reply
 function appendReply(outerCommentsBox, reply) {
     outerCommentsBox.append(`
             <div data-reply-id="${reply._id}" class="comment">
@@ -47,8 +50,8 @@ function appendReply(outerCommentsBox, reply) {
                     </div>
                 </div>
                 
-                <!-- Comments -->
-                <div class="comments">
+                <!-- Comments: Initially hidden -->
+                <div class="comments" style="display:none">
                     <div class="replies">
                         <!-- Comments to be added on page load/ new reply -->
                     </div>
@@ -58,18 +61,25 @@ function appendReply(outerCommentsBox, reply) {
 
     // Current reply
     let comment = $(`[data-reply-id="${reply._id}"]`);
-    // Comments COntainer for the reply
+    // Comments Container for the reply
     let comments = comment.children('.comments');
+    // Replies Button of current Reply
+    let repliesBtn = comment.children('.content').find('.reply');
+
+    // Toggle comments on clicking replies button
+    repliesBtn.click(() => {
+        comments.toggle(200, 'linear');
+    });
 
     // Get the Replies of current Reply
     $.get(`/replies/${reply._id}/replies`)
         .then((replies) => {
-                // Append each reply to replies container
-                replies.forEach((innerReply) => {
-                    appendReply(comments.children('.replies'), innerReply)
-                });
-                appendReplyForm(comments, reply._id);
-            })
+            // Append each reply to replies container
+            replies.forEach((innerReply) => {
+                appendReply(comments.children('.replies'), innerReply)
+            });
+            appendReplyForm(comments, reply._id);
+        })
         .catch((err) => {
             console.log(err);
         })
@@ -108,10 +118,10 @@ function updateReplies(pollId, outerCommentsBox) {
 
 // function to Make a POST AJAX request to Server to make a reply
 // and append the new reply returned to the comments Box
-function reply(pollId, outerCommentsBox, outerReplyTextArea) {
+function reply(pollId, outerCommentsBox, replyText) {
     // Make an AJAX Request with TextArea's Value
     $.post(`/discussions/${pollId}/replies`, {
-        body: outerReplyTextArea.val()
+        body: replyText
     })
         .then((reply) => {
             // If error present, throw it to be catched by outer catch statement
@@ -152,17 +162,21 @@ function appendReplyForm(comments, replyId) {
 
     // Form Reply Button
     formButton.click(() => {
+        // Get the reply text
         let replyText = formTextArea.val().trim();
-        $.post(`/replies/${replyId}/replies`, {
-            body: replyText
-        })
-        .then((reply) => {
-            appendReply(comments.children('.replies'), reply);
-        })
-        .catch((err) => {
-            console.log(err);
-        });
-        formTextArea.val('');
+        if (replyText !== "") {
+            // Make an AJAX Request with TextArea's Value
+            $.post(`/replies/${replyId}/replies`, {
+                body: replyText
+            })
+                .then((reply) => {
+                    appendReply(comments.children('.replies'), reply);
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+            formTextArea.val('');
+        }
     });
 
 }
