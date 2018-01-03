@@ -46,7 +46,7 @@ function appendReply(outerCommentsBox, reply) {
                     </div>
                     <!-- Reply Button -->
                     <div class="actions">
-                        <a class="reply">Replies (${reply.replies.length})</a>
+                        <a class="reply">Replies (<span class="replies-count">${reply.replies.length}</span>)</a>
                     </div>
                 </div>
                 
@@ -170,7 +170,10 @@ function appendReplyForm(comments, replyId) {
                 body: replyText
             })
                 .then((reply) => {
+                    // Append the new reply
                     appendReply(comments.children('.replies'), reply);
+                    // Increment parent's replies Count
+                    updateParentRepliesCount(comments.parent().children('.content').find('.replies-count'));
                 })
                 .catch((err) => {
                     console.log(err);
@@ -178,5 +181,16 @@ function appendReplyForm(comments, replyId) {
             formTextArea.val('');
         }
     });
+}
 
+// Function to update the Replies Count span, to increment the count
+function updateParentRepliesCount(repliesCountSpan) {
+    // Get replies count from the span
+    let repliesCount = parseInt(repliesCountSpan.text().trim());
+    // If span contained an integer(can be non integer if manipulated by Dev Tools)
+    if (!isNaN(repliesCount)) {
+        // Increment the count and update the span's text
+        ++repliesCount;
+        repliesCountSpan.text(repliesCount);
+    }
 }
