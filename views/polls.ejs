@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Polls Poller</title>
+
+    <!-- Include Commong files -->
+    <% include ./partials/header.ejs %>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/polls.css">
+    <!-- Custom JS -->
+    <script src="/js/polls.js"></script>
+
+</head>
+<body>
+
+<!-- NAVBAR -->
+<% include ./partials/navbar.ejs %>
+
+<!-- MAIN PAGE CONTAINER -->
+<div class="ui container">
+    <table class="ui celled striped table">
+        <!-- TABLE HEADER -->
+        <thead>
+            <tr>
+                <th><h1>Poll</h1></th>
+                <th>Votes</th>
+            </tr>
+        </thead>
+        <!-- CONTAINER FOR ALL POLLS -->
+        <tbody id="polls-container">
+            <!-- Individual Polls to be added by JS -->
+        </tbody>
+
+        <!-- FOOTER containing Pagination -->
+        <tfoot>
+            <th colspan="3">
+                <!-- GRID to center the Pagination -->
+                <div class="ui centered grid">
+                    <div class="center aligned column">
+                        <!-- PAGINATION MENU: Currently not functional -->
+                        <div id="pagination" class="ui pagination menu">
+                            <!-- Pagination Left Control -->
+                            <a class="icon item">
+                                <i class="left chevron icon"></i>
+                            </a>
+
+                            <!-- Pagination Pages -->
+                            <a class="active item">
+                                1
+                            </a>
+                            <a class="active item">
+                                2
+                            </a>
+                            <div class="disabled item">
+                                ...
+                            </div>
+                            <a class="item">
+                                8
+                            </a>
+                            <a class="item">
+                                9
+                            </a>
+                            <a class="item">
+                                10
+                            </a>
+
+                            <!-- Pagination Right Control -->
+                            <a class="icon item">
+                                <i class="right chevron icon"></i>
+                            </a>
+                        </div>
+                        <!-- END Pagination Menu -->
+                    </div>
+                </div>
+                <!-- END Pagination Container -->
+            </th>
+        </tfoot>
+    </table>
+</div>
+<!-- END Main Container -->
+
+</body>
+</html>

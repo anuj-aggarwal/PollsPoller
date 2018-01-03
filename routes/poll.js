@@ -9,6 +9,26 @@ const models = require('../models');
 //       ROUTES
 //--------------------
 
+// GET Route for all polls Page
+route.get('/show', (req,res)=>{
+    res.render('polls');
+});
+
+// GET Route for all polls
+route.get('/', (req,res)=>{
+    // Get all the polls with question, author and voteCount only
+    models.Poll.find({}, 'question author voteCount')
+        // Populate the username of the author
+        .populate('author', 'username')
+        .then((polls)=>{
+            // Send the Polls to user
+            res.send(polls);
+        })
+        .catch((err)=>{
+            console.log(err);
+        });
+});
+
 // GET Route for New Poll Page
 route.get('/new', (req,res)=>{
     res.render('newpoll');
