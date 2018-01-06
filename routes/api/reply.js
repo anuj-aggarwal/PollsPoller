@@ -26,34 +26,51 @@ route.get('/:id/replies', (req, res) => {
 });
 
 // Post Request for adding new reply to existing reply
-route.post('/:id/replies', (req,res)=>{
+route.post('/:id/replies', (req, res) => {
     // Create the new Reply
     models.Reply.create({
         sender: req.user._id,
         body: req.body.body
     })
-        .then((innerReply)=>{
+        .then((innerReply) => {
             console.log("Replied: " + innerReply);
             // Find the Outer Reply
             models.Reply.findById(req.params.id)
-                .then((reply)=>{
+                .then((reply) => {
                     // Add new reply to outer reply's replies
                     reply.replies.push(innerReply);
                     return reply.save();
                 })
-                .then((outerReply)=>{
+                .then((outerReply) => {
                     // Populate the sender
                     return models.Reply.populate(innerReply, 'sender');
                 })
-                .then((innerReply)=>{
+                .then((innerReply) => {
                     // Send the new reply to user
                     res.send(innerReply);
                 })
         })
-        .catch((err)=>{
+        .catch((err) => {
             console.log(err);
         })
 });
+
+// PATCH Request to change body of a Reply
+route.patch('/:id', (req, res) => {
+    // Find the reply
+    models.Reply.findByIdAndUpdate(req.params.id, {
+        body: req.body.body
+    })
+        .then((reply) => {
+            console.log("Updated: " + reply);
+            // Send the old reply to user
+            res.send(reply);
+        })
+        .catch((err) => {
+            console.log(err);
+        })
+});
+
 
 // Export the Router
 module.exports = route;

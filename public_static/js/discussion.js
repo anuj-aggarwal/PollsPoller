@@ -47,6 +47,7 @@ function appendReply(outerCommentsBox, reply) {
                     <!-- Reply Button -->
                     <div class="actions">
                         <a class="reply">Replies (<span class="replies-count">${reply.replies.length}</span>)</a>
+                        <a data-done="false" class="edit-reply">Edit</a>
                     </div>
                 </div>
                 
@@ -65,11 +66,51 @@ function appendReply(outerCommentsBox, reply) {
     let comments = comment.children('.comments');
     // Replies Button of current Reply
     let repliesBtn = comment.children('.content').find('.reply');
+    // Edit button of current Reply
+    let editReplyButton = comment.children('.content').find('.edit-reply');
+
 
     // Toggle comments on clicking replies button
     repliesBtn.click(() => {
         comments.toggle(200, 'linear');
     });
+
+    // Edit Reply Text on clicking Reply Button
+    editReplyButton.click(() => {
+        // Reply Text
+        let replyText = comment.children('.content').find('.text');
+
+        // If the button is Done Button
+        if (editReplyButton.data('done')) {
+
+            // Get the new reply text
+            let newReplyText = replyText.text().trim();
+            if (newReplyText !== "") {
+                // Confirm the Edit operation
+                if (confirm('Confirm Edit?')) {
+                    // Make PATCH Request to Server to update text
+                    $.ajax({
+                        url: `/api/replies/${reply._id}`,
+                        type: 'PATCH',
+                        data: {body: newReplyText}
+                    }).then((data) => {
+                        // Update Edit Button to Edit(from Done)
+                        editReplyButton.text('Edit').data('done', false);
+                        // Make Reply text not Editable
+                        replyText.attr('contentEditable', false);
+                    })
+                }
+            }
+        }
+        // If the button is Edit Button
+        else {
+            // Make Reply Text Editable
+            replyText.attr('contentEditable', true).focus();
+            // Change edit button to a Done Button
+            editReplyButton.text('Done').data('done', true);
+        }
+    });
+
 
     // Get the Replies of current Reply
     $.get(`/api/replies/${reply._id}/replies`)
