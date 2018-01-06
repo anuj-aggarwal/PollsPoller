@@ -14,7 +14,7 @@ $(() => {
 // Use appendPolls()
 function loadPolls(pollsContainer, sortBy) {
     // Get all polls from the Server sorted by sortBy
-    $.get(`/polls?sort=${sortBy}`)
+    $.get(`/api/polls?sort=${sortBy}`)
         .then((polls) => {
             // Append the polls to the Polls Container
             appendPolls(pollsContainer, polls);

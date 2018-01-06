@@ -28,7 +28,7 @@
                     <span data-user-id="<%= user._id %>" id="username" class="text">Welcome <%= user.username %></span>
                     <i class="dropdown icon"></i>
                     <div class="menu">
-                        <a href="/users/<%= user._id %>/polls/show?sort=recent" class="item">Your Polls</a>
+                        <a href="/users/<%= user._id %>/polls?sort=recent" class="item">Your Polls</a>
                         <a href="/polls/new" class="item">Create New Poll</a>
                         <a class="item">Profile</a>
                         <a href="/logout" class="item">Logout</a>

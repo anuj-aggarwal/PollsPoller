@@ -2,7 +2,7 @@
 const route = require("express").Router();
 
 // Require the DB Models
-const models = require('../models');
+const models = require('../../models');
 
 
 // Get request for all replies of a Reply
@@ -32,27 +32,27 @@ route.post('/:id/replies', (req,res)=>{
         sender: req.user._id,
         body: req.body.body
     })
-    .then((innerReply)=>{
-        console.log("Replied: " + innerReply);
-        // Find the Outer Reply
-        models.Reply.findById(req.params.id)
-        .then((reply)=>{
-            // Add new reply to outer reply's replies
-            reply.replies.push(innerReply);
-            return reply.save();
-        })
-        .then((outerReply)=>{
-            // Populate the sender
-            return models.Reply.populate(innerReply, 'sender');
-        })
         .then((innerReply)=>{
-            // Send the new reply to user
-            res.send(innerReply);
+            console.log("Replied: " + innerReply);
+            // Find the Outer Reply
+            models.Reply.findById(req.params.id)
+                .then((reply)=>{
+                    // Add new reply to outer reply's replies
+                    reply.replies.push(innerReply);
+                    return reply.save();
+                })
+                .then((outerReply)=>{
+                    // Populate the sender
+                    return models.Reply.populate(innerReply, 'sender');
+                })
+                .then((innerReply)=>{
+                    // Send the new reply to user
+                    res.send(innerReply);
+                })
         })
-    })
-    .catch((err)=>{
-        console.log(err);
-    })
+        .catch((err)=>{
+            console.log(err);
+        })
 });
 
 // Export the Router

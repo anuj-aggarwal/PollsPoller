@@ -37,7 +37,7 @@ $(() => {
     // Send POST Request on Clicking Create Button
     createPollBtn.click(() => {
         // Send request to create new Poll
-        $.post('/polls', {
+        $.post('/api/polls', {
             question: $('#question').val(),
             // Extract the options' texts from the Input List
             options: $('.option').toArray().map((option) => {

@@ -72,7 +72,7 @@ function appendReply(outerCommentsBox, reply) {
     });
 
     // Get the Replies of current Reply
-    $.get(`/replies/${reply._id}/replies`)
+    $.get(`/api/replies/${reply._id}/replies`)
         .then((replies) => {
             // Append each reply to replies container
             replies.forEach((innerReply) => {
@@ -101,7 +101,7 @@ function showReplies(outerCommentsBox, replies) {
 // uses showReplies()Container, innerReply);
 function updateReplies(pollId, outerCommentsBox) {
     // Make AJAX Request to Server
-    $.get(`/discussions/${pollId}/replies`)
+    $.get(`/api/discussions/${pollId}/replies`)
         .then((replies) => {
             // If Error not undefined, throw the Error to be catched in catch statement
             if (replies.err)
@@ -120,7 +120,7 @@ function updateReplies(pollId, outerCommentsBox) {
 // and append the new reply returned to the comments Box
 function reply(pollId, outerCommentsBox, replyText) {
     // Make an AJAX Request with TextArea's Value
-    $.post(`/discussions/${pollId}/replies`, {
+    $.post(`/api/discussions/${pollId}/replies`, {
         body: replyText
     })
         .then((reply) => {
@@ -166,7 +166,7 @@ function appendReplyForm(comments, replyId) {
         let replyText = formTextArea.val().trim();
         if (replyText !== "") {
             // Make an AJAX Request with TextArea's Value
-            $.post(`/replies/${replyId}/replies`, {
+            $.post(`/api/replies/${replyId}/replies`, {
                 body: replyText
             })
                 .then((reply) => {

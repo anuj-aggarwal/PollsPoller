@@ -17,7 +17,7 @@ function loadPolls(pollsContainer, sortBy) {
     let userId = $('#username').data('user-id');
 
     // Get all polls of user from the Server sorted by sortBy
-    $.get(`/users/${userId}/polls?sort=${sortBy}`)
+    $.get(`/api/users/${userId}/polls?sort=${sortBy}`)
         .then((polls) => {
             // Append the polls to the Polls Container
             appendPolls(pollsContainer, polls);
