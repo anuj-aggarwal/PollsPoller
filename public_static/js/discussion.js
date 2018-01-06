@@ -40,6 +40,8 @@ function appendReply(outerCommentsBox, reply) {
                 <div class="content">
                     <!-- Username -->
                     <a class="author">${reply.sender.username}</a>
+                    <!-- Delete Button -->
+                    <a class="delete-reply" style="display: none;"><i class="large trash icon"></i></a>
                     <!-- Text -->
                     <div class="text">
                         ${reply.body}
@@ -68,6 +70,15 @@ function appendReply(outerCommentsBox, reply) {
     let repliesBtn = comment.children('.content').find('.reply');
     // Edit button of current Reply
     let editReplyButton = comment.children('.content').find('.edit-reply');
+    // Delete Button of current Reply
+    let deleteReplyButton = comment.children('.content').find('.delete-reply');
+
+    // Display Delete Button on Hovering the Reply
+    comment.children('.content').hover(()=>{
+        deleteReplyButton.show();
+    }, ()=>{
+        deleteReplyButton.hide();
+    });
 
 
     // Toggle comments on clicking replies button
@@ -111,6 +122,43 @@ function appendReply(outerCommentsBox, reply) {
         }
     });
 
+    // Delete Reply on clicking Delete Button
+    deleteReplyButton.click(()=>{
+        // Confirm Delete
+        if(confirm('Delete Reply?')) {
+
+            // Get outer Reply
+            let outerReply = comment.parent().closest('.comment');
+
+            let requestBody = {};
+            // If Reply is outermost(No outer reply exists)
+            if(outerReply.length === 0) {
+                requestBody = {pollId : $('#outer-replies').data('poll-id')};
+            }
+            // If Reply is inner reply
+            else {
+                requestBody = {outerReplyId: outerReply.data('reply-id')};
+            }
+
+            // Send Delete Request to Server
+            $.ajax({
+                url: `/api/replies/${reply._id}`,
+                type: 'DELETE',
+                data: requestBody
+            })
+                .then((reply)=>{
+                    console.log("Deleted: ");
+                    console.log(reply);
+                    // Update replies count of parent reply(if exists)
+                    updateParentRepliesCount(outerReply.children('.content').find('.replies-count'), -1);
+                    // Remove the reply
+                    comment.remove();
+                })
+                .catch((err)=>{
+                    console.log(err);
+                })
+        }
+    });
 
     // Get the Replies of current Reply
     $.get(`/api/replies/${reply._id}/replies`)
@@ -214,7 +262,7 @@ function appendReplyForm(comments, replyId) {
                     // Append the new reply
                     appendReply(comments.children('.replies'), reply);
                     // Increment parent's replies Count
-                    updateParentRepliesCount(comments.parent().children('.content').find('.replies-count'));
+                    updateParentRepliesCount(comments.parent().children('.content').find('.replies-count'), 1);
                 })
                 .catch((err) => {
                     console.log(err);
@@ -225,13 +273,13 @@ function appendReplyForm(comments, replyId) {
 }
 
 // Function to update the Replies Count span, to increment the count
-function updateParentRepliesCount(repliesCountSpan) {
+function updateParentRepliesCount(repliesCountSpan, change) {
     // Get replies count from the span
     let repliesCount = parseInt(repliesCountSpan.text().trim());
     // If span contained an integer(can be non integer if manipulated by Dev Tools)
     if (!isNaN(repliesCount)) {
         // Increment the count and update the span's text
-        ++repliesCount;
+        repliesCount += change;
         repliesCountSpan.text(repliesCount);
     }
 }

@@ -71,6 +71,57 @@ route.patch('/:id', (req, res) => {
         })
 });
 
+// DELETE Request to delete a reply
+route.delete('/:id', (req, res) => {
+    // If reply is inner reply
+    if (req.body.outerReplyId !== undefined) {
+        // Find the outer Reply
+        models.Reply.findById(req.body.outerReplyId)
+            .then((outerReply) => {
+                // Remove the Reply from outerReply's replies
+                outerReply.replies = outerReply.replies.filter((reply) => {
+                    return (reply.toString() !== req.params.id);
+                });
+                return outerReply.save();
+            })
+            .then(() => {
+                // Delete the Reply from the database
+                return models.Reply.findByIdAndRemove(req.params.id);
+            })
+            .then((reply) => {
+                console.log("Deleted: " + reply);
+                // Send the deleted reply to user
+                res.send(reply);
+            })
+            .catch((err) => {
+                console.log(err);
+            })
+    }
+    // else, if reply is outermost reply
+    else {
+        // Find the Poll
+        models.Poll.findById(req.body.pollId)
+            .then((poll) => {
+                // Remove the Reply from Poll's replies
+                poll.replies = poll.replies.filter((reply) => {
+                    return (reply.toString() !== req.params.id);
+                });
+                return poll.save();
+            })
+            .then(() => {
+                // Delete the Reply from the database
+                return models.Reply.findByIdAndRemove(req.params.id);
+            })
+            .then((reply) => {
+                console.log("Deleted: " + reply);
+                // Send the deleted reply to user
+                res.send(reply);
+            })
+            .catch((err) => {
+                console.log(err);
+            })
+    }
+});
 
 // Export the Router
 module.exports = route;

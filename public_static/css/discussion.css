@@ -9,3 +9,12 @@
 .ui.comments {
     max-width: 100%;
 }
+
+.delete-reply {
+    float: right;
+    color: orangered;
+}
+
+.delete-reply:hover {
+    cursor: pointer;
+}
