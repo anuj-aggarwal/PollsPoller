@@ -49,7 +49,11 @@ function appendReply(outerCommentsBox, reply) {
                     <!-- Reply Button -->
                     <div class="actions">
                         <a class="reply">Replies (<span class="replies-count">${reply.replies.length}</span>)</a>
-                        <a data-done="false" class="edit-reply">Edit</a>
+                        <a data-done="false" class="edit-reply">
+                            <span class="edit-display">Edit</span>
+                            <!-- Spinner: Initially hidden -->
+                            <i class="edit-spinner spinner icon" style="display:none"></i>
+                        </a>
                     </div>
                 </div>
                 
@@ -70,13 +74,18 @@ function appendReply(outerCommentsBox, reply) {
     let repliesBtn = comment.children('.content').find('.reply');
     // Edit button of current Reply
     let editReplyButton = comment.children('.content').find('.edit-reply');
+    // Edit Button Display Text
+    let editDisplay = editReplyButton.find('.edit-display');
+    // Edit Button Spinner
+    let editSpinner = editReplyButton.find('.edit-spinner');
     // Delete Button of current Reply
     let deleteReplyButton = comment.children('.content').find('.delete-reply');
 
+
     // Display Delete Button on Hovering the Reply
-    comment.children('.content').hover(()=>{
+    comment.children('.content').hover(() => {
         deleteReplyButton.show();
-    }, ()=>{
+    }, () => {
         deleteReplyButton.hide();
     });
 
@@ -99,6 +108,12 @@ function appendReply(outerCommentsBox, reply) {
             if (newReplyText !== "") {
                 // Confirm the Edit operation
                 if (confirm('Confirm Edit?')) {
+
+                    // Display the spinner
+                    editSpinner.show();
+                    // Disable the Edit Button
+                    editReplyButton.css({pointerEvents: "none", cursor: "default"});
+
                     // Make PATCH Request to Server to update text
                     $.ajax({
                         url: `/api/replies/${reply._id}`,
@@ -106,9 +121,14 @@ function appendReply(outerCommentsBox, reply) {
                         data: {body: newReplyText}
                     }).then((data) => {
                         // Update Edit Button to Edit(from Done)
-                        editReplyButton.text('Edit').data('done', false);
+                        editReplyButton.data('done', false);
+                        editDisplay.text('Edit');
                         // Make Reply text not Editable
                         replyText.attr('contentEditable', false);
+                        // Hide the Spinner
+                        editSpinner.hide();
+                        // Enable the Edit Button
+                        editReplyButton.css({pointerEvents:"auto", cursor:"pointer"});
                     })
                 }
             }
@@ -118,22 +138,23 @@ function appendReply(outerCommentsBox, reply) {
             // Make Reply Text Editable
             replyText.attr('contentEditable', true).focus();
             // Change edit button to a Done Button
-            editReplyButton.text('Done').data('done', true);
+            editReplyButton.data('done', true);
+            editDisplay.text('Done');
         }
     });
 
     // Delete Reply on clicking Delete Button
-    deleteReplyButton.click(()=>{
+    deleteReplyButton.click(() => {
         // Confirm Delete
-        if(confirm('Delete Reply?')) {
+        if (confirm('Delete Reply?')) {
 
             // Get outer Reply
             let outerReply = comment.parent().closest('.comment');
 
             let requestBody = {};
             // If Reply is outermost(No outer reply exists)
-            if(outerReply.length === 0) {
-                requestBody = {pollId : $('#outer-replies').data('poll-id')};
+            if (outerReply.length === 0) {
+                requestBody = {pollId: $('#outer-replies').data('poll-id')};
             }
             // If Reply is inner reply
             else {
@@ -146,7 +167,7 @@ function appendReply(outerCommentsBox, reply) {
                 type: 'DELETE',
                 data: requestBody
             })
-                .then((reply)=>{
+                .then((reply) => {
                     console.log("Deleted: ");
                     console.log(reply);
                     // Update replies count of parent reply(if exists)
@@ -154,7 +175,7 @@ function appendReply(outerCommentsBox, reply) {
                     // Remove the reply
                     comment.remove();
                 })
-                .catch((err)=>{
+                .catch((err) => {
                     console.log(err);
                 })
         }
