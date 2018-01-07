@@ -71,6 +71,24 @@ route.patch('/:id', (req, res) => {
         })
 });
 
+
+// Function to delete a Reply and all its children
+function deleteReplyAndChildren(replyId) {
+    // Find the reply
+    return models.Reply.findById(replyId)
+        .then((reply)=>{
+            // Delete Inner(Children) Replies
+            let promises = reply.replies.map(reply=>deleteReplyAndChildren(reply));
+            return Promise.all(promises);
+        })
+        .then(()=>{
+            return models.Reply.findByIdAndRemove(replyId);
+        })
+        .then((reply)=>{
+            console.log("Deleted: " + reply);
+        })
+}
+
 // DELETE Request to delete a reply
 route.delete('/:id', (req, res) => {
     // If reply is inner reply
@@ -86,10 +104,9 @@ route.delete('/:id', (req, res) => {
             })
             .then(() => {
                 // Delete the Reply from the database
-                return models.Reply.findByIdAndRemove(req.params.id);
+                return deleteReplyAndChildren(req.params.id);
             })
             .then((reply) => {
-                console.log("Deleted: " + reply);
                 // Send the deleted reply to user
                 res.send(reply);
             })
@@ -110,10 +127,9 @@ route.delete('/:id', (req, res) => {
             })
             .then(() => {
                 // Delete the Reply from the database
-                return models.Reply.findByIdAndRemove(req.params.id);
+                return deleteReplyAndChildren(req.params.id);
             })
             .then((reply) => {
-                console.log("Deleted: " + reply);
                 // Send the deleted reply to user
                 res.send(reply);
             })
