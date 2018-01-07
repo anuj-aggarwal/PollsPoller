@@ -60,10 +60,12 @@ route.patch('/:id', (req, res) => {
     // Find the reply
     models.Reply.findByIdAndUpdate(req.params.id, {
         body: req.body.body
+    }, {
+        new: true
     })
         .then((reply) => {
-            console.log("Updated: " + reply);
-            // Send the old reply to user
+            console.log(`Updated Reply ${req.params.id}: ${reply}`);
+            // Send the new reply to user
             res.send(reply);
         })
         .catch((err) => {

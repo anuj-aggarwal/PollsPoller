@@ -116,6 +116,8 @@ function appendReply(outerCommentsBox, reply) {
                 // Confirm the Edit operation
                 if (confirm('Confirm Edit?')) {
 
+                    // Make Reply text not Editable
+                    replyText.attr('contentEditable', false);
                     // Display the spinner
                     editSpinner.show();
                     // Disable the Edit Button
@@ -126,12 +128,13 @@ function appendReply(outerCommentsBox, reply) {
                         url: `/api/replies/${reply._id}`,
                         type: 'PATCH',
                         data: {body: newReplyText}
-                    }).then((data) => {
+                    }).then((reply) => {
+                        // Update Reply Text with new data
+                        replyText.text(reply.body);
+
                         // Update Edit Button to Edit(from Done)
                         editReplyButton.data('done', false);
                         editDisplay.text('Edit');
-                        // Make Reply text not Editable
-                        replyText.attr('contentEditable', false);
                         // Hide the Spinner
                         editSpinner.hide();
                         // Enable the Edit Button
