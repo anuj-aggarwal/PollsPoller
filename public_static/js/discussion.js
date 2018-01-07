@@ -41,7 +41,10 @@ function appendReply(outerCommentsBox, reply) {
                     <!-- Username -->
                     <a class="author">${reply.sender.username}</a>
                     <!-- Delete Button -->
-                    <a class="delete-reply" style="display: none;"><i class="large trash icon"></i></a>
+                    <a class="delete-reply" style="display: none;">
+                        <i class="delete-icon large trash icon"></i>
+                    </a>
+                    <i class="delete-spinner large red spinner icon" style="display:none"></i>
                     <!-- Text -->
                     <div class="text">
                         ${reply.body}
@@ -80,6 +83,10 @@ function appendReply(outerCommentsBox, reply) {
     let editSpinner = editReplyButton.find('.edit-spinner');
     // Delete Button of current Reply
     let deleteReplyButton = comment.children('.content').find('.delete-reply');
+    // Trash Icon for Delete
+    let deleteIcon = deleteReplyButton.find('.delete-icon');
+    // Delete Spinner
+    let deleteSpinner = comment.children('.content').find('.delete-spinner');
 
 
     // Display Delete Button on Hovering the Reply
@@ -147,6 +154,10 @@ function appendReply(outerCommentsBox, reply) {
     deleteReplyButton.click(() => {
         // Confirm Delete
         if (confirm('Delete Reply?')) {
+
+            // Change Delete Icon to a Spinner
+            deleteIcon.hide();
+            deleteSpinner.show();
 
             // Get outer Reply
             let outerReply = comment.parent().closest('.comment');

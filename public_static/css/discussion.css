@@ -29,9 +29,14 @@
     }
 }
 
-.spinner.icon {
+.edit-spinner{
     width: 16px;
     height: 16px;
     margin: 0;
+    animation: 1s linear spin infinite;
+}
+
+.delete-spinner {
+    float: right;
     animation: 1s linear spin infinite;
 }
