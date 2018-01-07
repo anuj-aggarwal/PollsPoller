@@ -6,3 +6,12 @@
 .option {
     overflow-wrap: break-word;
 }
+
+.ui.remove.icon {
+    color: #ff0000;
+}
+
+.ui.remove.icon:hover {
+    cursor: pointer;
+    color: #0000ff;
+}

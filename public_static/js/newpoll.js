@@ -24,7 +24,7 @@ $(() => {
                 <div class="item">
                     <div class="ui grid">
                         <div class="option fourteen wide column">${optionInput.val().trim()}</div>
-                        <div class="two wide column"><i class="ui remove icon"></i></div>
+                        <div class="two wide column"><i class="delete-option ui remove icon"></i></div>
                     </div>
                 </div>
             `);
@@ -32,6 +32,9 @@ $(() => {
 
         // Initialize input value to ''
         optionInput.val('');
+
+        // Add Event Listeners to Delete Button
+        addDeleteEvents();
     });
 
     // Send POST Request on Clicking Create Button
@@ -57,3 +60,17 @@ $(() => {
         });
     });
 });
+
+// Function to add Event Listeners to Delete Button of Options
+function addDeleteEvents(){
+    let deleteOptionBtn = $(".delete-option");
+
+    //Remove old event handlers
+    deleteOptionBtn.off('click');
+
+    //Delete the option on click event
+    deleteOptionBtn.click((event)=>{
+        let option = $(event.target).closest('.item');
+        option.remove();
+    });
+}
