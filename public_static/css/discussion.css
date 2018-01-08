@@ -40,3 +40,12 @@
     float: right;
     animation: 1s linear spin infinite;
 }
+
+#spinner-container {
+    text-align: center;
+    padding: 5px;
+}
+
+#replies-spinner {
+    animation: 1s linear spin infinite;
+}

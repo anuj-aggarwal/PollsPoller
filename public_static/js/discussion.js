@@ -1,3 +1,7 @@
+const replyCount = 5;
+let repliesLoaded = 0;
+let allRepliesLoaded = false;
+
 $(() => {
     // Poll ID of the Discussion
     const pollId = $('#outer-replies').data('poll-id');
@@ -7,9 +11,27 @@ $(() => {
     const outerReplyTextArea = $('.outer-reply-text');
     // Outermost Reply Form's Reply Button
     const outerReplyButton = $('.outer-reply-button');
+    // Replies Spinner Container
+    const repliesSpinnerContainer = $('#spinner-container');
 
+    // Clear Previous Replies if present
+    outerCommentsBox.html('');
     // Initialize Comments on Page Load
-    updateReplies(pollId, outerCommentsBox);
+    updateReplies(pollId, outerCommentsBox, repliesSpinnerContainer);
+    // Avoid Scrolling of window at load
+    $(window).scrollTop(0);
+
+
+    // Check if User scrolled
+    $(window).scroll(function () {
+        if (allRepliesLoaded === false) {
+            // If user scrolled to bottom and has replies to load, update the replies
+            if ($(window).scrollTop() + $(window).height() >= $(document).height()) {
+                updateReplies(pollId, outerCommentsBox, repliesSpinnerContainer);
+            }
+        }
+    });
+
 
     /********************
      *  Event Listeners  *
@@ -138,7 +160,7 @@ function appendReply(outerCommentsBox, reply) {
                         // Hide the Spinner
                         editSpinner.hide();
                         // Enable the Edit Button
-                        editReplyButton.css({pointerEvents:"auto", cursor:"pointer"});
+                        editReplyButton.css({pointerEvents: "auto", cursor: "pointer"});
                     })
                 }
             }
@@ -212,8 +234,6 @@ function appendReply(outerCommentsBox, reply) {
 // Function to update all replies in comments Box with replies
 // uses appendReply()
 function showReplies(outerCommentsBox, replies) {
-    // Clear Previous Replies if present
-    outerCommentsBox.html('');
     // For each Reply in replies, append it to Comments Box
     replies.forEach((reply) => {
         appendReply(outerCommentsBox, reply)
@@ -223,21 +243,37 @@ function showReplies(outerCommentsBox, replies) {
 // Function to Load Replies from Server through AJAX Request
 // and updates the CommentsBox
 // uses showReplies()Container, innerReply);
-function updateReplies(pollId, outerCommentsBox) {
-    // Make AJAX Request to Server
-    $.get(`/api/discussions/${pollId}/replies`)
-        .then((replies) => {
-            // If Error not undefined, throw the Error to be catched in catch statement
-            if (replies.err)
-                throw new Error(replies.err);
+function updateReplies(pollId, outerCommentsBox, repliesSpinnerContainer) {
+    // Show the Replies spinner
+    repliesSpinnerContainer.show();
 
-            // update the DOM if no error
-            showReplies(outerCommentsBox, replies);
-        })
-        .catch((err) => {
-            // Log the Error if present
-            console.log("Error Extracting Replies");
-        });
+    // Create a delay for spinner to show
+    setTimeout(() => {
+        // Make AJAX Request to Server
+        $.get(`/api/discussions/${pollId}/replies?skip=${repliesLoaded}&limit=${replyCount}`)
+            .then((replies) => {
+                // If Error not undefined, throw the Error to be catched in catch statement
+                if (replies.err)
+                    throw new Error(replies.err);
+
+                repliesLoaded += replies.length;
+                if (replies.length === 0)
+                    allRepliesLoaded = true;
+
+                // update the DOM if no error
+                showReplies(outerCommentsBox, replies);
+
+                // Hide the Spinner
+                repliesSpinnerContainer.hide();
+
+                if ($(window).height() >= $(document).height() && allRepliesLoaded === false)
+                    updateReplies(pollId, outerCommentsBox, repliesSpinnerContainer);
+            })
+            .catch((err) => {
+                // Log the Error if present
+                console.log("Error Extracting Replies");
+            });
+    }, 500);
 }
 
 // function to Make a POST AJAX request to Server to make a reply
