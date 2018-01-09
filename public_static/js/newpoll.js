@@ -23,7 +23,12 @@ $(() => {
             optionList.append(`
                 <div class="item">
                     <div class="ui grid">
-                        <div class="option fourteen wide column">${optionInput.val().trim()}</div>
+                        <div class="option thirteen wide column">
+                            <div class="option-text">
+                                ${optionInput.val().trim()}
+                            </div>
+                        </div>
+                        <div class="one wide column"><i class="ui edit-option write icon" data-done="edit"></i></div>
                         <div class="two wide column"><i class="delete-option ui remove icon"></i></div>
                     </div>
                 </div>
@@ -35,6 +40,8 @@ $(() => {
 
         // Add Event Listeners to Delete Button
         addDeleteEvents();
+        // Add Event Listeners to Edit Button
+        addEditEvents();
     });
 
     // Send POST Request on Clicking Create Button
@@ -47,30 +54,69 @@ $(() => {
                 return $(option).text();
             })
         })
-        .then((data) => {
-            // Redirect to new Poll Page
-            console.log(data);
-            window.location = data;
-        })
-        .catch((err) => {
-            // Else log the Error and Reload the Page
-            // Reload to update the page with new Flash Message(if present)
-            console.log("Error creating event!!");
-            location.reload();
-        });
+            .then((data) => {
+                // Redirect to new Poll Page
+                console.log(data);
+                window.location = data;
+            })
+            .catch((err) => {
+                // Else log the Error and Reload the Page
+                // Reload to update the page with new Flash Message(if present)
+                console.log("Error creating event!!");
+                location.reload();
+            });
     });
 });
 
 // Function to add Event Listeners to Delete Button of Options
-function addDeleteEvents(){
+function addDeleteEvents() {
     let deleteOptionBtn = $(".delete-option");
 
     //Remove old event handlers
     deleteOptionBtn.off('click');
 
     //Delete the option on click event
-    deleteOptionBtn.click((event)=>{
+    deleteOptionBtn.click((event) => {
         let option = $(event.target).closest('.item');
         option.remove();
     });
+}
+
+// Function to add Event Listeners to Edit Button of Options
+function addEditEvents() {
+    let editOptionBtn = $(".edit-option");
+
+    //Remove old event handlers
+    editOptionBtn.off('click');
+
+    editOptionBtn.click((event) => {
+        let OptionField = $(event.target).closest(".ui.grid").find('.option .option-text');
+        //if edit button was clicked
+        if (editOptionBtn.data("done") === "edit") {
+            // Make Option Text editable and focused
+            $(OptionField).attr("contenteditable", true).focus();
+
+            //Change edit button to check mark
+            $(event.target).removeClass("write");
+            $(event.target).addClass("checkmark");
+
+            //Update data-btn attribute
+            editOptionBtn.data("done", "check");
+        }
+        //if check button was clicked
+        else {
+            //Get updated option value
+            let newOption = $(OptionField).text().trim();
+            $(OptionField).html(newOption);
+
+            $(OptionField).attr("contenteditable", false);
+
+            //Change checkmark to edit button
+            $(event.target).removeClass("checkmark");
+            $(event.target).addClass("write");
+
+            //Update data-btn attribute
+            editOptionBtn.data("done", "edit");
+        }
+    })
 }
