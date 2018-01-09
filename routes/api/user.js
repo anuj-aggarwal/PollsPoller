@@ -14,6 +14,12 @@ const {checkAPILoggedIn} = require('../../helpers');
 
 // GET Route for all polls of User
 route.get('/:id/polls',checkAPILoggedIn, (req,res)=>{
+    // If current user is not the same as requested User
+    if(req.user._id.toString()!==req.params.id){
+        console.log("Invalid Access!!");
+        res.send({err: "You can get your polls only!"});
+    }
+
     // Decide method for sorting(trending/recent/default)
     // from query parameter "sort"
     let sortBy;

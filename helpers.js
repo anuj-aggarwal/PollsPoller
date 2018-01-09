@@ -13,6 +13,7 @@ function checkAPILoggedIn(req, res, next){
     if(req.user)
         next();
     else{
+        console.log("Invalid Access!!");
         res.send({err: "User not logged in!!"});
     }
 }
