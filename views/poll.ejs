@@ -25,9 +25,9 @@
         <div class="ui segment">
             <div id="options" class="ui relaxed divided list">
                 <% poll.options.forEach((option)=>{ %>
-                    <div class="item">
+                    <div class="<%= (optionVoted===option._id.toString())?"highlighted ":"" %>option-item item">
                         <div class="ui radio checkbox">
-                            <input type="radio" name="option" value="<%= option._id %>" required>
+                            <input type="radio" name="option" value="<%= option._id %>" required <%= (user===undefined)?"disabled":"" %> >
                             <label class="option-body">
                                 <%= option.body %>
                             </label>
@@ -37,11 +37,20 @@
             </div>
         </div>
 
-        <!-- Vote Button -->
-        <button class="ui blue label">
-            Vote
-            <div class="detail"><%= poll.voteCount %></div>
-        </button>
+        <% if(user!==undefined) { %>
+            <!-- Vote Button: Enabled -->
+            <button class="ui blue label">
+                Vote
+                <div class="detail"><%= poll.voteCount %></div>
+            </button>
+        <% } else { %>
+            <!-- Vote Button: Disabled -->
+            <button class="ui disabled red label" data-inverted="" data-tooltip="Log In to Vote!" data-position="right center" disabled>
+                Vote
+                <div class="detail"><%= poll.voteCount %></div>
+            </button>
+        <% } %>
+
     </form>
 
     <!-- Link to Discussion -->
