@@ -45,6 +45,9 @@ $(() => {
             })
         })
         .then((data) => {
+            if(data.err)
+                throw new Error(data.err);
+
             // Redirect to new Poll Page
             console.log(data);
             window.location = data;

@@ -4,6 +4,9 @@ const route = require("express").Router();
 // Require the DB Models
 const models = require('../../models');
 
+// HELPERS
+const {checkAPILoggedIn} = require('../../helpers');
+
 
 // Get request for all replies of a Reply
 route.get('/:id/replies', (req, res) => {
@@ -26,7 +29,7 @@ route.get('/:id/replies', (req, res) => {
 });
 
 // Post Request for adding new reply to existing reply
-route.post('/:id/replies', (req,res)=>{
+route.post('/:id/replies',checkAPILoggedIn, (req,res)=>{
     // Create the new Reply
     models.Reply.create({
         sender: req.user._id,

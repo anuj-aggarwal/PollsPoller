@@ -4,6 +4,8 @@ const route = require("express").Router();
 // Require the DB Models
 const models = require('../../models');
 
+// HELPERS
+const {checkAPILoggedIn} = require('../../helpers');
 
 //--------------------
 //       ROUTES
@@ -46,7 +48,7 @@ route.get('/', (req,res)=>{
 
 
 // POST Route for Creating new Poll
-route.post('/', (req,res)=>{
+route.post('/', checkAPILoggedIn, (req,res)=>{
     // Create a new Poll
     models.Poll.create({
         author: req.user._id,

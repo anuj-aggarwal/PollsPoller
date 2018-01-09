@@ -4,6 +4,8 @@ const route = require("express").Router();
 // Require the DB Models
 const models = require('../models');
 
+// HELPERS
+const {checkLoggedIn} = require('../helpers');
 
 //--------------------
 //       ROUTES
@@ -26,7 +28,7 @@ route.get('/show', (req,res)=>{
 
 
 // GET Route for New Poll Page
-route.get('/new', (req,res)=>{
+route.get('/new', checkLoggedIn, (req,res)=>{
     res.render('newpoll');
 });
 
@@ -49,7 +51,7 @@ route.get('/:id', (req, res)=>{
 
 
 // POST Route to Vote
-route.post('/:id/votes', (req,res)=>{
+route.post('/:id/votes', checkLoggedIn, (req,res)=>{
     // Find the Poll
     models.Poll.findById(req.params.id)
     .then((poll)=>{

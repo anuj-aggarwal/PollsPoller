@@ -48,20 +48,6 @@ app.use(Passport.session());
 
 
 
-//--------------------
-//    HELPERS
-//--------------------
-
-function checkLoggedIn(req, res, next){
-    if(req.user)
-        next();
-    else{
-        console.log("Invalid Access!!");
-        res.redirect("/");
-    }
-}
-
-
 // Serve static files
 app.use('/', express.static(path.join(__dirname, 'public_static')));
 

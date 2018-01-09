@@ -5,12 +5,15 @@ const route = require("express").Router();
 const models = require('../../models');
 
 
+// HELPERS
+const {checkAPILoggedIn} = require('../../helpers');
+
 //--------------------
 //       ROUTES
 //--------------------
 
 // GET Route for all polls of User
-route.get('/:id/polls', (req,res)=>{
+route.get('/:id/polls',checkAPILoggedIn, (req,res)=>{
     // Decide method for sorting(trending/recent/default)
     // from query parameter "sort"
     let sortBy;

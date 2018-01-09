@@ -170,6 +170,9 @@ function appendReplyForm(comments, replyId) {
                 body: replyText
             })
                 .then((reply) => {
+                    if(reply.err)
+                        throw new Error(reply.err);
+
                     // Append the new reply
                     appendReply(comments.children('.replies'), reply);
                     // Increment parent's replies Count
