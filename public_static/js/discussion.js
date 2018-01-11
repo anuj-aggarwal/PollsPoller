@@ -157,8 +157,15 @@ function appendReply(outerCommentsBox, reply) {
                         type: 'PATCH',
                         data: {body: newReplyText}
                     }).then((reply) => {
-                        if (reply.err)
+                        if (reply.err) {
+                            // Hide the Spinner
+                            editSpinner.hide();
+                            // Enable the Edit Button
+                            editReplyButton.css({pointerEvents: "auto", cursor: "pointer"});
+                            // Keep Text Editable only
+                            replyText.attr('contentEditable', true).focus();
                             throw new Error(reply.err);
+                        }
 
                         // Update Reply Text with new data
                         replyText.text(reply.body);
@@ -216,8 +223,11 @@ function appendReply(outerCommentsBox, reply) {
                 data: requestBody
             })
                 .then((reply) => {
-                    if (reply.err)
+                    if (reply.err) {
+                        deleteSpinner.hide();
+                        deleteIcon.show();
                         throw new Error(reply.err);
+                    }
 
                     console.log("Deleted: ");
                     console.log(reply);
