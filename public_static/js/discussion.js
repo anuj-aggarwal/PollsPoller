@@ -62,10 +62,13 @@ function appendReply(outerCommentsBox, reply) {
                 <div class="content">
                     <!-- Username -->
                     <a class="author">${reply.sender.username}</a>
-                    <!-- Delete Button -->
-                    <a class="delete-reply" style="display: none;">
-                        <i class="delete-icon large trash icon"></i>
-                    </a>
+                    ${(reply.sender._id.toString() === $('#username').data('user-id')) ?`
+                            <!-- Delete Button -->
+                            <a class="delete-reply" style="display: none;">
+                                <i class="delete-icon large trash icon"></i>
+                            </a>                  
+                        `:''
+                    }
                     <i class="delete-spinner large red spinner icon" style="display:none"></i>
                     <!-- Text -->
                     <div class="text">
@@ -74,11 +77,14 @@ function appendReply(outerCommentsBox, reply) {
                     <!-- Reply Button -->
                     <div class="actions">
                         <a class="reply">Replies (<span class="replies-count">${reply.replies.length}</span>)</a>
-                        <a data-done="false" class="edit-reply">
-                            <span class="edit-display">Edit</span>
-                            <!-- Spinner: Initially hidden -->
-                            <i class="edit-spinner spinner icon" style="display:none"></i>
-                        </a>
+                        ${(reply.sender._id.toString() === $('#username').data('user-id'))?`
+                                <a data-done="false" class="edit-reply">
+                                    <span class="edit-display">Edit</span>
+                                    <!-- Spinner: Initially hidden -->
+                                    <i class="edit-spinner spinner icon" style="display:none"></i>
+                                </a>                    
+                            `:''
+                        }
                     </div>
                 </div>
                 
@@ -309,19 +315,37 @@ function reply(pollId, outerCommentsBox, replyText) {
 
 // Function to append the Reply Form at the end of Comments Container of a Reply
 function appendReplyForm(comments, replyId) {
-    comments.append(`
-         <!-- Outermost Reply Form -->
-        <form class="ui form reply-form">
-            <!-- TextArea -->
-            <div class="field">
-                <textarea class="outer-reply-text" rows="2"></textarea>
-            </div>
-            <!-- Reply Button -->
-            <div class="ui blue labeled submit icon button outer-reply-button">
-                <i class="icon edit"></i> Add Reply
-            </div>
-        </form>
-    `);
+    if($('#username').data('user-id')) {
+        comments.append(`
+            <!-- Outermost Reply Form -->
+            <form class="ui form reply-form">
+                <!-- TextArea -->
+                <div class="field">
+                    <textarea class="outer-reply-text" rows="2"></textarea>
+                </div>
+                <!-- Reply Button -->
+                <div class="ui blue labeled submit icon button outer-reply-button">
+                    <i class="icon edit"></i> Add Reply
+                </div>
+            </form>
+        `);
+    }
+    else {
+        comments.append(`
+            <!-- Outermost Reply Form -->
+            <form class="ui form reply-form">
+                <!-- No Reply Text -->
+
+                <!-- Reply Button -->
+                <span data-inverted="" data-tooltip="Login to Reply!" data-position="right center">
+                    <button class="ui disabled labeled submit icon button outer-reply-button">
+                        <i class="icon edit"></i> Add Reply
+                    </button>
+                </span>
+            </form>
+        `);
+    }
+
 
 
     // EVENT LISTENERS

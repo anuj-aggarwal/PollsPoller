@@ -106,7 +106,7 @@ route.delete('/:id', checkAPILoggedIn, (req, res) => {
     models.Reply.findById(req.params.id)
         .select('sender')
         .then((reply) => {
-            if (reply.sender.toString() !== req.user._id) {
+            if (reply.sender.toString() !== req.user._id.toString()) {
                 res.send({err: "Can't Delete other user's reply"});
                 throw Error("Invalid Access!!");
             }
