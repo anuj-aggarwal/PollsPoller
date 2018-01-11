@@ -57,7 +57,7 @@ route.get('/:pollId/replies', (req, res) => {
         })
         .then((poll) => {
             // Send the replies to the user
-            res.send(poll.replies);
+            res.send(poll.replies.slice(parseInt(req.query.skip), parseInt(req.query.skip) + parseInt(req.query.limit)));
         })
         .catch((err) => {
             // Log the Error and Redirect to Home Page

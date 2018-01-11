@@ -9,3 +9,43 @@
 .ui.comments {
     max-width: 100%;
 }
+
+.delete-reply {
+    float: right;
+    color: orangered;
+}
+
+.delete-reply:hover {
+    cursor: pointer;
+}
+
+
+@keyframes spin{
+    from {
+        transform: rotate(0);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.edit-spinner{
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    animation: 1s linear spin infinite;
+}
+
+.delete-spinner {
+    float: right;
+    animation: 1s linear spin infinite;
+}
+
+#spinner-container {
+    text-align: center;
+    padding: 5px;
+}
+
+#replies-spinner {
+    animation: 1s linear spin infinite;
+}

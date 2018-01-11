@@ -1,3 +1,7 @@
+const replyCount = 5;
+let repliesLoaded = 0;
+let allRepliesLoaded = false;
+
 $(() => {
     // Poll ID of the Discussion
     const pollId = $('#outer-replies').data('poll-id');
@@ -7,9 +11,27 @@ $(() => {
     const outerReplyTextArea = $('.outer-reply-text');
     // Outermost Reply Form's Reply Button
     const outerReplyButton = $('.outer-reply-button');
+    // Replies Spinner Container
+    const repliesSpinnerContainer = $('#spinner-container');
 
+    // Clear Previous Replies if present
+    outerCommentsBox.html('');
     // Initialize Comments on Page Load
-    updateReplies(pollId, outerCommentsBox);
+    updateReplies(pollId, outerCommentsBox, repliesSpinnerContainer);
+    // Avoid Scrolling of window at load
+    $(window).scrollTop(0);
+
+
+    // Check if User scrolled
+    $(window).scroll(function () {
+        if (allRepliesLoaded === false) {
+            // If user scrolled to bottom and has replies to load, update the replies
+            if ($(window).scrollTop() + $(window).height() >= $(document).height()) {
+                updateReplies(pollId, outerCommentsBox, repliesSpinnerContainer);
+            }
+        }
+    });
+
 
     /********************
      *  Event Listeners  *
@@ -40,6 +62,11 @@ function appendReply(outerCommentsBox, reply) {
                 <div class="content">
                     <!-- Username -->
                     <a class="author">${reply.sender.username}</a>
+                    <!-- Delete Button -->
+                    <a class="delete-reply" style="display: none;">
+                        <i class="delete-icon large trash icon"></i>
+                    </a>
+                    <i class="delete-spinner large red spinner icon" style="display:none"></i>
                     <!-- Text -->
                     <div class="text">
                         ${reply.body}
@@ -47,6 +74,11 @@ function appendReply(outerCommentsBox, reply) {
                     <!-- Reply Button -->
                     <div class="actions">
                         <a class="reply">Replies (<span class="replies-count">${reply.replies.length}</span>)</a>
+                        <a data-done="false" class="edit-reply">
+                            <span class="edit-display">Edit</span>
+                            <!-- Spinner: Initially hidden -->
+                            <i class="edit-spinner spinner icon" style="display:none"></i>
+                        </a>
                     </div>
                 </div>
                 
@@ -65,10 +97,124 @@ function appendReply(outerCommentsBox, reply) {
     let comments = comment.children('.comments');
     // Replies Button of current Reply
     let repliesBtn = comment.children('.content').find('.reply');
+    // Edit button of current Reply
+    let editReplyButton = comment.children('.content').find('.edit-reply');
+    // Edit Button Display Text
+    let editDisplay = editReplyButton.find('.edit-display');
+    // Edit Button Spinner
+    let editSpinner = editReplyButton.find('.edit-spinner');
+    // Delete Button of current Reply
+    let deleteReplyButton = comment.children('.content').find('.delete-reply');
+    // Trash Icon for Delete
+    let deleteIcon = deleteReplyButton.find('.delete-icon');
+    // Delete Spinner
+    let deleteSpinner = comment.children('.content').find('.delete-spinner');
+
+
+    // Display Delete Button on Hovering the Reply
+    comment.children('.content').hover(() => {
+        deleteReplyButton.show();
+    }, () => {
+        deleteReplyButton.hide();
+    });
+
 
     // Toggle comments on clicking replies button
     repliesBtn.click(() => {
         comments.toggle(200, 'linear');
+    });
+
+    // Edit Reply Text on clicking Reply Button
+    editReplyButton.click(() => {
+        // Reply Text
+        let replyText = comment.children('.content').find('.text');
+
+        // If the button is Done Button
+        if (editReplyButton.data('done')) {
+
+            // Get the new reply text
+            let newReplyText = replyText.text().trim();
+            if (newReplyText !== "") {
+                // Confirm the Edit operation
+                if (confirm('Confirm Edit?')) {
+
+                    // Make Reply text not Editable
+                    replyText.attr('contentEditable', false);
+                    // Display the spinner
+                    editSpinner.show();
+                    // Disable the Edit Button
+                    editReplyButton.css({pointerEvents: "none", cursor: "default"});
+
+                    // Make PATCH Request to Server to update text
+                    $.ajax({
+                        url: `/api/replies/${reply._id}`,
+                        type: 'PATCH',
+                        data: {body: newReplyText}
+                    }).then((reply) => {
+                        // Update Reply Text with new data
+                        replyText.text(reply.body);
+
+                        // Update Edit Button to Edit(from Done)
+                        editReplyButton.data('done', false);
+                        editDisplay.text('Edit');
+                        // Hide the Spinner
+                        editSpinner.hide();
+                        // Enable the Edit Button
+                        editReplyButton.css({pointerEvents: "auto", cursor: "pointer"});
+                    })
+                }
+            }
+        }
+        // If the button is Edit Button
+        else {
+            // Make Reply Text Editable
+            replyText.attr('contentEditable', true).focus();
+            // Change edit button to a Done Button
+            editReplyButton.data('done', true);
+            editDisplay.text('Done');
+        }
+    });
+
+    // Delete Reply on clicking Delete Button
+    deleteReplyButton.click(() => {
+        // Confirm Delete
+        if (confirm('Delete Reply?')) {
+
+            // Change Delete Icon to a Spinner
+            deleteIcon.hide();
+            deleteSpinner.show();
+
+            // Get outer Reply
+            let outerReply = comment.parent().closest('.comment');
+
+            let requestBody = {};
+            // If Reply is outermost(No outer reply exists)
+            if (outerReply.length === 0) {
+                requestBody = {pollId: $('#outer-replies').data('poll-id')};
+            }
+            // If Reply is inner reply
+            else {
+                requestBody = {outerReplyId: outerReply.data('reply-id')};
+            }
+
+            // Send Delete Request to Server
+            $.ajax({
+                url: `/api/replies/${reply._id}`,
+                type: 'DELETE',
+                data: requestBody
+            })
+                .then((reply) => {
+                    console.log("Deleted: ");
+                    console.log(reply);
+                    // Update replies count of parent reply(if exists)
+                    updateParentRepliesCount(outerReply.children('.content').find('.replies-count'), -1);
+                    // Remove the reply
+                    comment.remove();
+                })
+                .catch((err) => {
+                    console.log(err);
+                })
+        }
     });
 
     // Get the Replies of current Reply
@@ -88,8 +234,6 @@ function appendReply(outerCommentsBox, reply) {
 // Function to update all replies in comments Box with replies
 // uses appendReply()
 function showReplies(outerCommentsBox, replies) {
-    // Clear Previous Replies if present
-    outerCommentsBox.html('');
     // For each Reply in replies, append it to Comments Box
     replies.forEach((reply) => {
         appendReply(outerCommentsBox, reply)
@@ -99,21 +243,37 @@ function showReplies(outerCommentsBox, replies) {
 // Function to Load Replies from Server through AJAX Request
 // and updates the CommentsBox
 // uses showReplies()Container, innerReply);
-function updateReplies(pollId, outerCommentsBox) {
-    // Make AJAX Request to Server
-    $.get(`/api/discussions/${pollId}/replies`)
-        .then((replies) => {
-            // If Error not undefined, throw the Error to be catched in catch statement
-            if (replies.err)
-                throw new Error(replies.err);
+function updateReplies(pollId, outerCommentsBox, repliesSpinnerContainer) {
+    // Show the Replies spinner
+    repliesSpinnerContainer.show();
 
-            // update the DOM if no error
-            showReplies(outerCommentsBox, replies);
-        })
-        .catch((err) => {
-            // Log the Error if present
-            console.log("Error Extracting Replies");
-        });
+    // Create a delay for spinner to show
+    setTimeout(() => {
+        // Make AJAX Request to Server
+        $.get(`/api/discussions/${pollId}/replies?skip=${repliesLoaded}&limit=${replyCount}`)
+            .then((replies) => {
+                // If Error not undefined, throw the Error to be catched in catch statement
+                if (replies.err)
+                    throw new Error(replies.err);
+
+                repliesLoaded += replies.length;
+                if (replies.length === 0)
+                    allRepliesLoaded = true;
+
+                // update the DOM if no error
+                showReplies(outerCommentsBox, replies);
+
+                // Hide the Spinner
+                repliesSpinnerContainer.hide();
+
+                if ($(window).height() >= $(document).height() && allRepliesLoaded === false)
+                    updateReplies(pollId, outerCommentsBox, repliesSpinnerContainer);
+            })
+            .catch((err) => {
+                // Log the Error if present
+                console.log("Error Extracting Replies");
+            });
+    }, 500);
 }
 
 // function to Make a POST AJAX request to Server to make a reply
@@ -176,7 +336,7 @@ function appendReplyForm(comments, replyId) {
                     // Append the new reply
                     appendReply(comments.children('.replies'), reply);
                     // Increment parent's replies Count
-                    updateParentRepliesCount(comments.parent().children('.content').find('.replies-count'));
+                    updateParentRepliesCount(comments.parent().children('.content').find('.replies-count'), 1);
                 })
                 .catch((err) => {
                     console.log(err);
@@ -187,13 +347,13 @@ function appendReplyForm(comments, replyId) {
 }
 
 // Function to update the Replies Count span, to increment the count
-function updateParentRepliesCount(repliesCountSpan) {
+function updateParentRepliesCount(repliesCountSpan, change) {
     // Get replies count from the span
     let repliesCount = parseInt(repliesCountSpan.text().trim());
     // If span contained an integer(can be non integer if manipulated by Dev Tools)
     if (!isNaN(repliesCount)) {
         // Increment the count and update the span's text
-        ++repliesCount;
+        repliesCount += change;
         repliesCountSpan.text(repliesCount);
     }
 }
