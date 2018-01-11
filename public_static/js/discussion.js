@@ -151,6 +151,9 @@ function appendReply(outerCommentsBox, reply) {
                         type: 'PATCH',
                         data: {body: newReplyText}
                     }).then((reply) => {
+                        if (reply.err)
+                            throw new Error(reply.err);
+
                         // Update Reply Text with new data
                         replyText.text(reply.body);
 
@@ -162,6 +165,9 @@ function appendReply(outerCommentsBox, reply) {
                         // Enable the Edit Button
                         editReplyButton.css({pointerEvents: "auto", cursor: "pointer"});
                     })
+                        .catch((err) => {
+                            console.log(err);
+                        })
                 }
             }
         }
@@ -204,6 +210,9 @@ function appendReply(outerCommentsBox, reply) {
                 data: requestBody
             })
                 .then((reply) => {
+                    if (reply.err)
+                        throw new Error(reply.err);
+
                     console.log("Deleted: ");
                     console.log(reply);
                     // Update replies count of parent reply(if exists)
@@ -330,7 +339,7 @@ function appendReplyForm(comments, replyId) {
                 body: replyText
             })
                 .then((reply) => {
-                    if(reply.err)
+                    if (reply.err)
                         throw new Error(reply.err);
 
                     // Append the new reply

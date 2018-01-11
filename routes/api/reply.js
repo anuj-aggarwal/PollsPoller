@@ -29,7 +29,7 @@ route.get('/:id/replies', (req, res) => {
 });
 
 // Post Request for adding new reply to existing reply
-route.post('/:id/replies',checkAPILoggedIn, (req,res)=>{
+route.post('/:id/replies', checkAPILoggedIn, (req, res) => {
     // Create the new Reply
     models.Reply.create({
         sender: req.user._id,
@@ -59,21 +59,27 @@ route.post('/:id/replies',checkAPILoggedIn, (req,res)=>{
 });
 
 // PATCH Request to change body of a Reply
-route.patch('/:id', (req, res) => {
-    // Find the reply
-    models.Reply.findByIdAndUpdate(req.params.id, {
-        body: req.body.body
-    }, {
-        new: true
-    })
+route.patch('/:id', checkAPILoggedIn, (req, res) => {
+    // Find the Reply
+    models.Reply.findById(req.params.id)
         .then((reply) => {
-            console.log(`Updated Reply ${req.params.id}: ${reply}`);
-            // Send the new reply to user
+            // If reply's author not the same as current user, ERROR
+            if (reply.sender.toString() !== req.user._id.toString()) {
+                res.send({err: "Can't Change other user's Reply!"});
+                throw new Error("Invalid Access!!");
+            }
+
+            // else, If User is same as author, Update the reply
+            reply.body = req.body.body;
+            return reply.save();
+        })
+        .then((reply) => {
+            // Send the new Reply to User
             res.send(reply);
         })
         .catch((err) => {
             console.log(err);
-        })
+        });
 });
 
 
@@ -81,67 +87,81 @@ route.patch('/:id', (req, res) => {
 function deleteReplyAndChildren(replyId) {
     // Find the reply
     return models.Reply.findById(replyId)
-        .then((reply)=>{
+        .then((reply) => {
             // Delete Inner(Children) Replies
-            let promises = reply.replies.map(reply=>deleteReplyAndChildren(reply));
+            let promises = reply.replies.map(reply => deleteReplyAndChildren(reply));
             return Promise.all(promises);
         })
-        .then(()=>{
+        .then(() => {
             return models.Reply.findByIdAndRemove(replyId);
         })
-        .then((reply)=>{
+        .then((reply) => {
             console.log("Deleted: " + reply);
         })
 }
 
 // DELETE Request to delete a reply
-route.delete('/:id', (req, res) => {
-    // If reply is inner reply
-    if (req.body.outerReplyId !== undefined) {
-        // Find the outer Reply
-        models.Reply.findById(req.body.outerReplyId)
-            .then((outerReply) => {
-                // Remove the Reply from outerReply's replies
-                outerReply.replies = outerReply.replies.filter((reply) => {
-                    return (reply.toString() !== req.params.id);
-                });
-                return outerReply.save();
-            })
-            .then(() => {
-                // Delete the Reply from the database
-                return deleteReplyAndChildren(req.params.id);
-            })
-            .then((reply) => {
-                // Send the deleted reply to user
-                res.send(reply);
-            })
-            .catch((err) => {
-                console.log(err);
-            })
-    }
-    // else, if reply is outermost reply
-    else {
-        // Find the Poll
-        models.Poll.findById(req.body.pollId)
-            .then((poll) => {
-                // Remove the Reply from Poll's replies
-                poll.replies = poll.replies.filter((reply) => {
-                    return (reply.toString() !== req.params.id);
-                });
-                return poll.save();
-            })
-            .then(() => {
-                // Delete the Reply from the database
-                return deleteReplyAndChildren(req.params.id);
-            })
-            .then((reply) => {
-                // Send the deleted reply to user
-                res.send(reply);
-            })
-            .catch((err) => {
-                console.log(err);
-            })
-    }
+route.delete('/:id', checkAPILoggedIn, (req, res) => {
+    // Find id the reply is of user only
+    models.Reply.findById(req.params.id)
+        .select('sender')
+        .then((reply) => {
+            if (reply.sender.toString() !== req.user._id) {
+                res.send({err: "Can't Delete other user's reply"});
+                throw Error("Invalid Access!!");
+            }
+        })
+        .then(() => {
+            // If reply is inner reply
+            if (req.body.outerReplyId !== undefined) {
+                // Find the outer Reply
+                models.Reply.findById(req.body.outerReplyId)
+                    .then((outerReply) => {
+                        // Remove the Reply from outerReply's replies
+                        outerReply.replies = outerReply.replies.filter((reply) => {
+                            return (reply.toString() !== req.params.id);
+                        });
+                        return outerReply.save();
+                    })
+                    .then(() => {
+                        // Delete the Reply from the database
+                        return deleteReplyAndChildren(req.params.id);
+                    })
+                    .then((reply) => {
+                        // Send the deleted reply to user
+                        res.send(reply);
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                    })
+            }
+            // else, if reply is outermost reply
+            else {
+                // Find the Poll
+                models.Poll.findById(req.body.pollId)
+                    .then((poll) => {
+                        // Remove the Reply from Poll's replies
+                        poll.replies = poll.replies.filter((reply) => {
+                            return (reply.toString() !== req.params.id);
+                        });
+                        return poll.save();
+                    })
+                    .then(() => {
+                        // Delete the Reply from the database
+                        return deleteReplyAndChildren(req.params.id);
+                    })
+                    .then((reply) => {
+                        // Send the deleted reply to user
+                        res.send(reply);
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                    })
+            }
+        })
+        .catch((err) => {
+            console.log(err);
+        });
 });
 
 // Export the Router
