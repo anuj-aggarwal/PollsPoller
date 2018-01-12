@@ -15,13 +15,9 @@ $(() => {
 function loadPolls(pollsContainer, sortBy) {
     // Get all polls from the Server sorted by sortBy
     $.get(`/api/polls?sort=${sortBy}`)
-        .then(polls => {
-            // Append the polls to the Polls Container
-            appendPolls(pollsContainer, polls);
-        })
-        .catch(err => {
-            console.log(err);
-        });
+        // Append the polls to the Polls Container
+        .then(polls => appendPolls(pollsContainer, polls))
+        .catch(console.log);
 }
 
 // Function to append polls to the DOM
@@ -30,9 +26,7 @@ function appendPolls(pollsContainer, polls) {
     // Clear Container
     pollsContainer.html('');
     // Append each poll to the Polls Container
-    polls.forEach(poll => {
-        appendPoll(pollsContainer, poll);
-    });
+    polls.forEach(poll => appendPoll(pollsContainer, poll));
 }
 
 // Function to append Poll to the pollsContainer

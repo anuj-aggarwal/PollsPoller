@@ -25,9 +25,7 @@ function loadPolls(pollsContainer, sortBy) {
             // Append the polls to the Polls Container
             appendPolls(pollsContainer, polls);
         })
-        .catch(err => {
-            console.log(err);
-        });
+        .catch(console.log);
 }
 
 // Function to append polls to the DOM
@@ -36,9 +34,7 @@ function appendPolls(pollsContainer, polls) {
     // Clear Container
     pollsContainer.html('');
     // Append each poll to the Polls Container
-    polls.forEach(poll => {
-        appendPoll(pollsContainer, poll);
-    });
+    polls.forEach(poll => appendPoll(pollsContainer, poll));
 }
 
 // Function to append Poll to the pollsContainer

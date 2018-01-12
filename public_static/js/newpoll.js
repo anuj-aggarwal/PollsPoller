@@ -40,9 +40,7 @@ $(() => {
         $.post('/api/polls', {
             question: $('#question').val(),
             // Extract the options' texts from the Input List
-            options: $('.option').toArray().map(option => {
-                return $(option).text();
-            })
+            options: $('.option').toArray().map(option => $(option).text())
         })
         .then(data => {
             if(data.err)

@@ -118,17 +118,11 @@ function appendReply(outerCommentsBox, reply) {
 
 
     // Display Delete Button on Hovering the Reply
-    comment.children('.content').hover(() => {
-        deleteReplyButton.show();
-    }, () => {
-        deleteReplyButton.hide();
-    });
+    comment.children('.content').hover(deleteReplyButton.show, deleteReplyButton.hide);
 
 
     // Toggle comments on clicking replies button
-    repliesBtn.click(() => {
-        comments.toggle(200, 'linear');
-    });
+    repliesBtn.click(() => comments.toggle(200, 'linear'));
 
     // Edit Reply Text on clicking Reply Button
     editReplyButton.click(() => {
@@ -178,9 +172,7 @@ function appendReply(outerCommentsBox, reply) {
                         // Enable the Edit Button
                         editReplyButton.css({pointerEvents: "auto", cursor: "pointer"});
                     })
-                        .catch(err => {
-                            console.log(err);
-                        })
+                        .catch(console.log);
                 }
             }
         }
@@ -236,9 +228,7 @@ function appendReply(outerCommentsBox, reply) {
                     // Remove the reply
                     comment.remove();
                 })
-                .catch(err => {
-                    console.log(err);
-                })
+                .catch(console.log);
         }
     });
 
@@ -246,23 +236,17 @@ function appendReply(outerCommentsBox, reply) {
     $.get(`/api/replies/${reply._id}/replies`)
         .then(replies => {
             // Append each reply to replies container
-            replies.forEach(innerReply => {
-                appendReply(comments.children('.replies'), innerReply)
-            });
+            replies.forEach(innerReply => appendReply(comments.children('.replies'), innerReply));
             appendReplyForm(comments, reply._id);
         })
-        .catch(err => {
-            console.log(err);
-        })
+        .catch(console.log);
 }
 
 // Function to update all replies in comments Box with replies
 // uses appendReply()
 function showReplies(outerCommentsBox, replies) {
     // For each Reply in replies, append it to Comments Box
-    replies.forEach(reply => {
-        appendReply(outerCommentsBox, reply)
-    });
+    replies.forEach(reply => appendReply(outerCommentsBox, reply));
 }
 
 // Function to Load Replies from Server through AJAX Request
@@ -294,10 +278,8 @@ function updateReplies(pollId, outerCommentsBox, repliesSpinnerContainer) {
                 if ($(window).height() >= $(document).height() && allRepliesLoaded === false)
                     updateReplies(pollId, outerCommentsBox, repliesSpinnerContainer);
             })
-            .catch(err => {
-                // Log the Error if present
-                console.log("Error Extracting Replies");
-            });
+            // Log the Error if present
+            .catch(err => console.log("Error Extracting Replies"));
     }, 500);
 }
 
@@ -316,10 +298,8 @@ function reply(pollId, outerCommentsBox, replyText) {
             // Append the new Reply to Comments Box
             appendReply(outerCommentsBox, reply);
         })
-        .catch(err => {
-            // Log the Error if present
-            console.log(err);
-        })
+        // Log the Error if present
+        .catch(console.log);
 }
 
 
@@ -381,9 +361,7 @@ function appendReplyForm(comments, replyId) {
                     // Increment parent's replies Count
                     updateParentRepliesCount(comments.parent().children('.content').find('.replies-count'), 1);
                 })
-                .catch(err => {
-                    console.log(err);
-                });
+                .catch(console.log);
             formTextArea.val('');
         }
     });
