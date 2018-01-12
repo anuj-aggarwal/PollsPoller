@@ -13,11 +13,11 @@ const models = require('../models');
 route.get('/:pollId', (req, res) => {
     // Find the Poll with specified id in params
     models.Poll.findById(req.params.pollId)
-        .then((poll) => {
+        .then(poll => {
             // If found, Render the Discussion Page
             res.render('discussion', {poll});
         })
-        .catch((err) => {
+        .catch(err => {
             // Else redirect User to Index Page
             console.log("Error: " + err);
             res.redirect('/');

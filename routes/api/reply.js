@@ -19,11 +19,11 @@ route.get('/:id/replies', (req, res) => {
                 path: 'sender'
             }
         })
-        .then((reply) => {
+        .then(reply => {
             // Send the replies to user
             res.send(reply.replies);
         })
-        .catch((err) => {
+        .catch(err => {
             console.log(err);
         })
 });
@@ -35,25 +35,25 @@ route.post('/:id/replies', checkAPILoggedIn, (req, res) => {
         sender: req.user._id,
         body: req.body.body
     })
-        .then((innerReply) => {
+        .then(innerReply => {
             console.log("Replied: " + innerReply);
             // Find the Outer Reply
             models.Reply.findById(req.params.id)
-                .then((reply) => {
+                .then(reply => {
                     // Add new reply to outer reply's replies
                     reply.replies.push(innerReply);
                     return reply.save();
                 })
-                .then((outerReply) => {
+                .then(outerReply => {
                     // Populate the sender
                     return models.Reply.populate(innerReply, 'sender');
                 })
-                .then((innerReply) => {
+                .then(innerReply => {
                     // Send the new reply to user
                     res.send(innerReply);
                 })
         })
-        .catch((err) => {
+        .catch(err => {
             console.log(err);
         })
 });
@@ -62,7 +62,7 @@ route.post('/:id/replies', checkAPILoggedIn, (req, res) => {
 route.patch('/:id', checkAPILoggedIn, (req, res) => {
     // Find the Reply
     models.Reply.findById(req.params.id)
-        .then((reply) => {
+        .then(reply => {
             // If reply's author not the same as current user, ERROR
             if (reply.sender.toString() !== req.user._id.toString()) {
                 res.send({err: "Can't Change other user's Reply!"});
@@ -73,11 +73,11 @@ route.patch('/:id', checkAPILoggedIn, (req, res) => {
             reply.body = req.body.body;
             return reply.save();
         })
-        .then((reply) => {
+        .then(reply => {
             // Send the new Reply to User
             res.send(reply);
         })
-        .catch((err) => {
+        .catch(err => {
             console.log(err);
         });
 });
@@ -87,7 +87,7 @@ route.patch('/:id', checkAPILoggedIn, (req, res) => {
 function deleteReplyAndChildren(replyId) {
     // Find the reply
     return models.Reply.findById(replyId)
-        .then((reply) => {
+        .then(reply => {
             // Delete Inner(Children) Replies
             let promises = reply.replies.map(reply => deleteReplyAndChildren(reply));
             return Promise.all(promises);
@@ -95,7 +95,7 @@ function deleteReplyAndChildren(replyId) {
         .then(() => {
             return models.Reply.findByIdAndRemove(replyId);
         })
-        .then((reply) => {
+        .then(reply => {
             console.log("Deleted: " + reply);
         })
 }
@@ -105,7 +105,7 @@ route.delete('/:id', checkAPILoggedIn, (req, res) => {
     // Find id the reply is of user only
     models.Reply.findById(req.params.id)
         .select('sender')
-        .then((reply) => {
+        .then(reply => {
             if (reply.sender.toString() !== req.user._id.toString()) {
                 res.send({err: "Can't Delete other user's reply"});
                 throw Error("Invalid Access!!");
@@ -116,9 +116,9 @@ route.delete('/:id', checkAPILoggedIn, (req, res) => {
             if (req.body.outerReplyId !== undefined) {
                 // Find the outer Reply
                 models.Reply.findById(req.body.outerReplyId)
-                    .then((outerReply) => {
+                    .then(outerReply => {
                         // Remove the Reply from outerReply's replies
-                        outerReply.replies = outerReply.replies.filter((reply) => {
+                        outerReply.replies = outerReply.replies.filter(reply => {
                             return (reply.toString() !== req.params.id);
                         });
                         return outerReply.save();
@@ -127,11 +127,11 @@ route.delete('/:id', checkAPILoggedIn, (req, res) => {
                         // Delete the Reply from the database
                         return deleteReplyAndChildren(req.params.id);
                     })
-                    .then((reply) => {
+                    .then(reply => {
                         // Send the deleted reply to user
                         res.send(reply);
                     })
-                    .catch((err) => {
+                    .catch(err => {
                         console.log(err);
                     })
             }
@@ -139,9 +139,9 @@ route.delete('/:id', checkAPILoggedIn, (req, res) => {
             else {
                 // Find the Poll
                 models.Poll.findById(req.body.pollId)
-                    .then((poll) => {
+                    .then(poll => {
                         // Remove the Reply from Poll's replies
-                        poll.replies = poll.replies.filter((reply) => {
+                        poll.replies = poll.replies.filter(reply => {
                             return (reply.toString() !== req.params.id);
                         });
                         return poll.save();
@@ -150,16 +150,16 @@ route.delete('/:id', checkAPILoggedIn, (req, res) => {
                         // Delete the Reply from the database
                         return deleteReplyAndChildren(req.params.id);
                     })
-                    .then((reply) => {
+                    .then(reply => {
                         // Send the deleted reply to user
                         res.send(reply);
                     })
-                    .catch((err) => {
+                    .catch(err => {
                         console.log(err);
                     })
             }
         })
-        .catch((err) => {
+        .catch(err => {
             console.log(err);
         });
 });

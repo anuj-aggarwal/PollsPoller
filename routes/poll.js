@@ -37,14 +37,14 @@ route.get('/new', checkLoggedIn, (req,res)=>{
 route.get('/:id', (req, res)=>{
     // Find the Poll with specified id in params
     models.Poll.findById(req.params.id).populate('author')
-    .then((poll)=>{
+    .then(poll=>{
 
         // Find the Vote of current user
         let optionVoted;
         // If user logged in
         if(req.user) {
             // Find user's vote
-            let vote = poll.votes.filter((vote)=>{
+            let vote = poll.votes.filter(vote=>{
                 return (vote.voter.toString() === req.user._id.toString());
             });
             // If already voted
@@ -55,7 +55,7 @@ route.get('/:id', (req, res)=>{
         // If found, Render the Poll Page
         res.render('poll', {poll, optionVoted});
     })
-    .catch((err)=>{
+    .catch(err=>{
         // Else redirect User to Index Page
         console.log("Error: " + err);
         res.redirect('/');
@@ -67,9 +67,9 @@ route.get('/:id', (req, res)=>{
 route.post('/:id/votes', checkLoggedIn, (req,res)=>{
     // Find the Poll
     models.Poll.findById(req.params.id)
-    .then((poll)=>{
+    .then(poll=>{
         // Find if User has already Voted on the Poll
-        let vote = poll.votes.filter((vote)=>{
+        let vote = poll.votes.filter(vote=>{
             // Compare the ids of vote and user Id
             // toString() used to avoid Object Comparison
             if(vote.voter.toString()===req.user._id.toString())
@@ -84,7 +84,7 @@ route.post('/:id/votes', checkLoggedIn, (req,res)=>{
                 option: req.body.option
             });
             // Increase a vote of options vote count
-            poll.options.forEach((option)=>{
+            poll.options.forEach(option=>{
                 if(option._id.toString()===req.body.option)
                     ++option.votes;
             });
@@ -97,14 +97,14 @@ route.post('/:id/votes', checkLoggedIn, (req,res)=>{
             // Decrease a vote for previous options
             // Increase a vote for new option
             // Handles the case of voting on same option
-            poll.options.forEach((option)=>{
+            poll.options.forEach(option=>{
                 if(option._id.toString()===req.body.option)
                     ++option.votes;
                 if(option._id.toString() === vote[0].option.toString())
                     --option.votes;
             });
             // Change vote of the User to new Option
-            poll.votes.forEach((vote)=>{
+            poll.votes.forEach(vote=>{
                 if(vote.voter.toString() ===req.user._id.toString())
                     vote.option = req.body.option;
             });
@@ -112,12 +112,12 @@ route.post('/:id/votes', checkLoggedIn, (req,res)=>{
             return poll.save();
         }
     })
-    .then((poll)=>{
+    .then(poll=>{
         // Redirect user to the polls page
         // TODO: Redirect to some other page depending on further use
         res.redirect(`/polls/${req.params.id}`);
     })
-    .catch((err)=>{
+    .catch(err=>{
         // Redirect user to the polls page
         // TODO: Redirect to some other page depending on further use
         console.log(err);

@@ -21,7 +21,7 @@ mongoose.connect(`mongodb://${CONFIG.DB.HOST}:${CONFIG.DB.PORT}/${CONFIG.DB.NAME
 .then(()=>{
     console.log(`Database ${CONFIG.DB.NAME} Ready for Use!`);
 })
-.catch((err)=>{
+.catch(err=>{
     console.log(`Error connecting to Database: ${err}`);
 });
 

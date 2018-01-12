@@ -15,28 +15,28 @@ const {checkAPILoggedIn} = require('../../helpers');
 route.post('/:pollId/replies', checkAPILoggedIn, (req, res) => {
     // Find the poll to reply on
     models.Poll.findById(req.params.pollId)
-        .then((poll) => {
+        .then(poll => {
             // Create new Reply
             let reply = models.Reply.create({
                 sender: req.user._id,
                 body: req.body.body
             })
-                .then((reply) => {
+                .then(reply => {
                     // Add the new reply to poll's Replies
                     poll.replies.push(reply._id);
                     poll.save()
-                        .then((poll)=>{
+                        .then(poll=>{
                             // Find the newly Added Reply
                             // Populate the Sender
                             return models.Reply.findById(reply._id).populate('sender');
                         })
-                        .then((reply)=>{
+                        .then(reply=>{
                             // Send the New populated Reply to the User
                             res.send(reply);
                         });
                 });
         })
-        .catch((err) => {
+        .catch(err => {
             // Else redirect User to Index Page
             console.log("Error: " + err);
             res.send({err:"Unable to Reply"});
@@ -55,11 +55,11 @@ route.get('/:pollId/replies', (req, res) => {
                 path: 'sender'
             }
         })
-        .then((poll) => {
+        .then(poll => {
             // Send the replies to the user
             res.send(poll.replies.slice(parseInt(req.query.skip), parseInt(req.query.skip) + parseInt(req.query.limit)));
         })
-        .catch((err) => {
+        .catch(err => {
             // Log the Error and Redirect to Home Page
             console.log(err);
             res.redirect({err:"Unable to Retrieve Replies"});

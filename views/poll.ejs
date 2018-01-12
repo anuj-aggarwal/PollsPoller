@@ -24,7 +24,7 @@
         <!-- Options List -->
         <div class="ui segment">
             <div id="options" class="ui relaxed divided list">
-                <% poll.options.forEach((option)=>{ %>
+                <% poll.options.forEach(option=>{ %>
                     <!-- If this is option voted -->
                     <% if(optionVoted === option._id.toString()) { %>
                         <div class="highlighted option-item item">

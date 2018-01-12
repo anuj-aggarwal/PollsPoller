@@ -15,10 +15,10 @@ passport.deserializeUser((username, done)=>{
     models.User.findOne({
         username
     })
-    .then((user)=>{
+    .then(user=>{
         done(null, user);
     })
-    .catch((err)=>{
+    .catch(err=>{
         done(err);
     })
 });
@@ -30,7 +30,7 @@ const localStrategy = new LocalStrategy((username, password, done)=>{
     models.User.findOne({
         username
     })
-    .then((user)=>{
+    .then(user=>{
         // If User does not exists
         if(user===null)
             return done(null, false, {message: "User not found!"});
@@ -40,7 +40,7 @@ const localStrategy = new LocalStrategy((username, password, done)=>{
         // Otherwise, we are done.....User found!!
         return done(null, user);
     })
-    .catch((err)=>{
+    .catch(err=>{
         // Log the Error and call done
         console.log("ERROR");
         done(err);

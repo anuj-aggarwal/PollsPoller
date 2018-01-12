@@ -94,7 +94,7 @@ app.post("/signup", (req,res, next)=>{
     models.User.findOne({
         username: req.body.username
     })
-    .then((user)=>{
+    .then(user=>{
         // If user does not exists, create new User
         if(user === null)
             return models.User.create({
@@ -107,7 +107,7 @@ app.post("/signup", (req,res, next)=>{
         else
             throw Error("User already Exists");
     })
-    .then((user)=>{
+    .then(user=>{
         // Redirect to Login/SignUp Page
         console.log("User created: ");
         console.log(user);
@@ -119,7 +119,7 @@ app.post("/signup", (req,res, next)=>{
         })(req,res, next);
 
     })
-    .catch((err)=>{
+    .catch(err=>{
         // Redirect to Home Page
         console.log(err);
         res.redirect("/");
