@@ -19,13 +19,9 @@ route.get('/:id/replies', (req, res) => {
                 path: 'sender'
             }
         })
-        .then(reply => {
-            // Send the replies to user
-            res.send(reply.replies);
-        })
-        .catch(err => {
-            console.log(err);
-        })
+        // Send the replies to user
+        .then(reply => res.send(reply.replies))
+        .catch(console.log);
 });
 
 // Post Request for adding new reply to existing reply
@@ -48,14 +44,10 @@ route.post('/:id/replies', checkAPILoggedIn, (req, res) => {
                     // Populate the sender
                     return models.Reply.populate(innerReply, 'sender');
                 })
-                .then(innerReply => {
-                    // Send the new reply to user
-                    res.send(innerReply);
-                })
+                // Send the new reply to user
+                .then(innerReply => res.send(innerReply))
         })
-        .catch(err => {
-            console.log(err);
-        })
+        .catch(console.log);
 });
 
 // PATCH Request to change body of a Reply
@@ -73,13 +65,9 @@ route.patch('/:id', checkAPILoggedIn, (req, res) => {
             reply.body = req.body.body;
             return reply.save();
         })
-        .then(reply => {
-            // Send the new Reply to User
-            res.send(reply);
-        })
-        .catch(err => {
-            console.log(err);
-        });
+        // Send the new Reply to User
+        .then(reply => res.send(reply))
+        .catch(console.log);
 });
 
 
@@ -95,9 +83,7 @@ function deleteReplyAndChildren(replyId) {
         .then(() => {
             return models.Reply.findByIdAndRemove(replyId);
         })
-        .then(reply => {
-            console.log("Deleted: " + reply);
-        })
+        .then(reply => console.log("Deleted: " + reply));
 }
 
 // DELETE Request to delete a reply
@@ -118,22 +104,14 @@ route.delete('/:id', checkAPILoggedIn, (req, res) => {
                 models.Reply.findById(req.body.outerReplyId)
                     .then(outerReply => {
                         // Remove the Reply from outerReply's replies
-                        outerReply.replies = outerReply.replies.filter(reply => {
-                            return (reply.toString() !== req.params.id);
-                        });
+                        outerReply.replies = outerReply.replies.filter(reply => (reply.toString() !== req.params.id));
                         return outerReply.save();
                     })
-                    .then(() => {
-                        // Delete the Reply from the database
-                        return deleteReplyAndChildren(req.params.id);
-                    })
-                    .then(reply => {
-                        // Send the deleted reply to user
-                        res.send(reply);
-                    })
-                    .catch(err => {
-                        console.log(err);
-                    })
+                    // Delete the Reply from the database
+                    .then(() => deleteReplyAndChildren(req.params.id))
+                    // Send the deleted reply to user
+                    .then(reply => res.send(reply))
+                    .catch(console.log);
             }
             // else, if reply is outermost reply
             else {
@@ -141,27 +119,16 @@ route.delete('/:id', checkAPILoggedIn, (req, res) => {
                 models.Poll.findById(req.body.pollId)
                     .then(poll => {
                         // Remove the Reply from Poll's replies
-                        poll.replies = poll.replies.filter(reply => {
-                            return (reply.toString() !== req.params.id);
-                        });
+                        poll.replies = poll.replies.filter(reply => (reply.toString() !== req.params.id));
                         return poll.save();
                     })
-                    .then(() => {
-                        // Delete the Reply from the database
-                        return deleteReplyAndChildren(req.params.id);
-                    })
-                    .then(reply => {
-                        // Send the deleted reply to user
-                        res.send(reply);
-                    })
-                    .catch(err => {
-                        console.log(err);
-                    })
+                    // Delete the Reply from the database
+                    .then(() => deleteReplyAndChildren(req.params.id))
+                    // Send the deleted reply to user
+                    .then(reply => res.send(reply))
             }
         })
-        .catch(err => {
-            console.log(err);
-        });
+        .catch(console.log);
 });
 
 // Export the Router

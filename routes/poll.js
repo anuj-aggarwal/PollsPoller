@@ -112,11 +112,9 @@ route.post('/:id/votes', checkLoggedIn, (req,res)=>{
             return poll.save();
         }
     })
-    .then(poll=>{
-        // Redirect user to the polls page
-        // TODO: Redirect to some other page depending on further use
-        res.redirect(`/polls/${req.params.id}`);
-    })
+    // Redirect user to the polls page
+    // TODO: Redirect to some other page depending on further use
+    .then(poll => res.redirect(`/polls/${req.params.id}`))
     .catch(err=>{
         // Redirect user to the polls page
         // TODO: Redirect to some other page depending on further use

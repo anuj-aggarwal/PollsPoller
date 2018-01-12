@@ -37,13 +37,9 @@ route.get('/', (req,res)=>{
         .sort({[sortBy]: 'descending'})
         // Populate the username of the author
         .populate('author', 'username')
-        .then(polls=>{
-            // Send the Polls to user
-            res.send(polls);
-        })
-        .catch(err=>{
-            console.log(err);
-        });
+        // Send the Polls to user
+        .then(polls => res.send(polls))
+        .catch(console.log);
 });
 
 
@@ -64,11 +60,9 @@ route.post('/', checkAPILoggedIn, (req,res)=>{
         isPollOpen: true,
         isDiscussionOpen: true
     })
-        .then(poll=>{
-            // Send the new Poll's Address to the User
-            res.send(`/polls/${poll._id}`);
-        })
-        .catch(err=>{
+        // Send the new Poll's Address to the User
+        .then(poll => res.send(`/polls/${poll._id}`))
+        .catch(err => {
             // If error, redirect on the Same Page
             console.log(`Error! ${err}`);
             res.send('/polls/new');

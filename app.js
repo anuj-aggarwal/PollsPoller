@@ -67,14 +67,10 @@ app.use('/users', require('./routes/user'));
 app.use('/api', require('./routes/api'));
 
 // root Route
-app.get("/", (req,res)=>{
-    res.render("index");
-});
+app.get("/", (req,res) => res.render("index"));
 
 // Login/Signup Page
-app.get("/loginsignup", (req, res)=>{
-    res.render("loginsignup");
-});
+app.get("/loginsignup", (req, res) => res.render("loginsignup"));
 
 // Use passport Authenticate at Login POST Route
 app.post("/login", Passport.authenticate('local', {

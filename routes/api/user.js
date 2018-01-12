@@ -44,13 +44,9 @@ route.get('/:id/polls',checkAPILoggedIn, (req,res)=>{
     }, 'question createdAt voteCount')
     // Sort the polls according to sorting method
         .sort({[sortBy]: 'descending'})
-        .then(polls=>{
-            // Send the Polls to user
-            res.send(polls);
-        })
-        .catch(err=>{
-            console.log(err);
-        });
+        // Send the Polls to user
+        .then(polls => res.send(polls))
+        .catch(console.log);
 });
 
 // Export the Router

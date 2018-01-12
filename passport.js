@@ -6,21 +6,15 @@ const LocalStrategy = require("passport-local").Strategy;
 const models = require("./models");
 
 // Serialize User to username
-passport.serializeUser((user, done)=>{
-    done(null, user.username);
-});
+passport.serializeUser((user, done) => done(null, user.username));
 
 // Deserisalize User from username
 passport.deserializeUser((username, done)=>{
     models.User.findOne({
         username
     })
-    .then(user=>{
-        done(null, user);
-    })
-    .catch(err=>{
-        done(err);
-    })
+    .then(user => done(null, user))
+    .catch(err => done(err))
 });
 
 
