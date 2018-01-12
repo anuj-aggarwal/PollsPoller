@@ -10,3 +10,12 @@
     max-width: 60vw;
     overflow-wrap: break-word;
 }
+
+.option-item {
+    padding: 5px !important;
+    border-radius: 10px;
+}
+
+.highlighted {
+    background-color: #21ba45a8;
+}

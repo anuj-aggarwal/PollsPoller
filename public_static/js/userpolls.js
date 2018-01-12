@@ -19,6 +19,9 @@ function loadPolls(pollsContainer, sortBy) {
     // Get all polls of user from the Server sorted by sortBy
     $.get(`/api/users/${userId}/polls?sort=${sortBy}`)
         .then((polls) => {
+            if(polls.err)
+                throw new Error(polls.err);
+
             // Append the polls to the Polls Container
             appendPolls(pollsContainer, polls);
         })

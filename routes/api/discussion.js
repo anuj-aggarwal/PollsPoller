@@ -4,13 +4,15 @@ const route = require("express").Router();
 // Require the DB Models
 const models = require('../../models');
 
+// HELPERS
+const {checkAPILoggedIn} = require('../../helpers');
 
 //--------------------
 //       ROUTES
 //--------------------
 
 // POST Route for Replying to Discussion(not to another reply)
-route.post('/:pollId/replies', (req, res) => {
+route.post('/:pollId/replies', checkAPILoggedIn, (req, res) => {
     // Find the poll to reply on
     models.Poll.findById(req.params.pollId)
         .then((poll) => {

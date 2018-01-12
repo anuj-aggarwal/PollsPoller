@@ -4,6 +4,8 @@ const route = require("express").Router();
 // Require the DB Models
 const models = require('../models');
 
+// HELPERS
+const {checkLoggedIn} = require('../helpers');
 
 //--------------------
 //       ROUTES
@@ -26,7 +28,7 @@ route.get('/show', (req,res)=>{
 
 
 // GET Route for New Poll Page
-route.get('/new', (req,res)=>{
+route.get('/new', checkLoggedIn, (req,res)=>{
     res.render('newpoll');
 });
 
@@ -36,9 +38,22 @@ route.get('/:id', (req, res)=>{
     // Find the Poll with specified id in params
     models.Poll.findById(req.params.id).populate('author')
     .then((poll)=>{
+
+        // Find the Vote of current user
+        let optionVoted;
+        // If user logged in
+        if(req.user) {
+            // Find user's vote
+            let vote = poll.votes.filter((vote)=>{
+                return (vote.voter.toString() === req.user._id.toString());
+            });
+            // If already voted
+            if(vote.length > 0)
+                optionVoted = vote[0].option.toString();
+        }
+
         // If found, Render the Poll Page
-        console.log(poll);
-        res.render('poll', {poll});
+        res.render('poll', {poll, optionVoted});
     })
     .catch((err)=>{
         // Else redirect User to Index Page
@@ -49,7 +64,7 @@ route.get('/:id', (req, res)=>{
 
 
 // POST Route to Vote
-route.post('/:id/votes', (req,res)=>{
+route.post('/:id/votes', checkLoggedIn, (req,res)=>{
     // Find the Poll
     models.Poll.findById(req.params.id)
     .then((poll)=>{

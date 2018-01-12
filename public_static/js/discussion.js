@@ -62,10 +62,13 @@ function appendReply(outerCommentsBox, reply) {
                 <div class="content">
                     <!-- Username -->
                     <a class="author">${reply.sender.username}</a>
-                    <!-- Delete Button -->
-                    <a class="delete-reply" style="display: none;">
-                        <i class="delete-icon large trash icon"></i>
-                    </a>
+                    ${(reply.sender._id.toString() === $('#username').data('user-id')) ?`
+                            <!-- Delete Button -->
+                            <a class="delete-reply" style="display: none;">
+                                <i class="delete-icon large trash icon"></i>
+                            </a>                  
+                        `:''
+                    }
                     <i class="delete-spinner large red spinner icon" style="display:none"></i>
                     <!-- Text -->
                     <div class="text">
@@ -74,11 +77,14 @@ function appendReply(outerCommentsBox, reply) {
                     <!-- Reply Button -->
                     <div class="actions">
                         <a class="reply">Replies (<span class="replies-count">${reply.replies.length}</span>)</a>
-                        <a data-done="false" class="edit-reply">
-                            <span class="edit-display">Edit</span>
-                            <!-- Spinner: Initially hidden -->
-                            <i class="edit-spinner spinner icon" style="display:none"></i>
-                        </a>
+                        ${(reply.sender._id.toString() === $('#username').data('user-id'))?`
+                                <a data-done="false" class="edit-reply">
+                                    <span class="edit-display">Edit</span>
+                                    <!-- Spinner: Initially hidden -->
+                                    <i class="edit-spinner spinner icon" style="display:none"></i>
+                                </a>                    
+                            `:''
+                        }
                     </div>
                 </div>
                 
@@ -151,6 +157,16 @@ function appendReply(outerCommentsBox, reply) {
                         type: 'PATCH',
                         data: {body: newReplyText}
                     }).then((reply) => {
+                        if (reply.err) {
+                            // Hide the Spinner
+                            editSpinner.hide();
+                            // Enable the Edit Button
+                            editReplyButton.css({pointerEvents: "auto", cursor: "pointer"});
+                            // Keep Text Editable only
+                            replyText.attr('contentEditable', true).focus();
+                            throw new Error(reply.err);
+                        }
+
                         // Update Reply Text with new data
                         replyText.text(reply.body);
 
@@ -162,6 +178,9 @@ function appendReply(outerCommentsBox, reply) {
                         // Enable the Edit Button
                         editReplyButton.css({pointerEvents: "auto", cursor: "pointer"});
                     })
+                        .catch((err) => {
+                            console.log(err);
+                        })
                 }
             }
         }
@@ -204,6 +223,12 @@ function appendReply(outerCommentsBox, reply) {
                 data: requestBody
             })
                 .then((reply) => {
+                    if (reply.err) {
+                        deleteSpinner.hide();
+                        deleteIcon.show();
+                        throw new Error(reply.err);
+                    }
+
                     console.log("Deleted: ");
                     console.log(reply);
                     // Update replies count of parent reply(if exists)
@@ -300,19 +325,37 @@ function reply(pollId, outerCommentsBox, replyText) {
 
 // Function to append the Reply Form at the end of Comments Container of a Reply
 function appendReplyForm(comments, replyId) {
-    comments.append(`
-         <!-- Outermost Reply Form -->
-        <form class="ui form reply-form">
-            <!-- TextArea -->
-            <div class="field">
-                <textarea class="outer-reply-text" rows="2"></textarea>
-            </div>
-            <!-- Reply Button -->
-            <div class="ui blue labeled submit icon button outer-reply-button">
-                <i class="icon edit"></i> Add Reply
-            </div>
-        </form>
-    `);
+    if($('#username').data('user-id')) {
+        comments.append(`
+            <!-- Outermost Reply Form -->
+            <form class="ui form reply-form">
+                <!-- TextArea -->
+                <div class="field">
+                    <textarea class="outer-reply-text" rows="2"></textarea>
+                </div>
+                <!-- Reply Button -->
+                <div class="ui blue labeled submit icon button outer-reply-button">
+                    <i class="icon edit"></i> Add Reply
+                </div>
+            </form>
+        `);
+    }
+    else {
+        comments.append(`
+            <!-- Outermost Reply Form -->
+            <form class="ui form reply-form">
+                <!-- No Reply Text -->
+
+                <!-- Reply Button -->
+                <span data-inverted="" data-tooltip="Login to Reply!" data-position="right center">
+                    <button class="ui disabled labeled submit icon button outer-reply-button">
+                        <i class="icon edit"></i> Add Reply
+                    </button>
+                </span>
+            </form>
+        `);
+    }
+
 
 
     // EVENT LISTENERS
@@ -330,6 +373,9 @@ function appendReplyForm(comments, replyId) {
                 body: replyText
             })
                 .then((reply) => {
+                    if (reply.err)
+                        throw new Error(reply.err);
+
                     // Append the new reply
                     appendReply(comments.children('.replies'), reply);
                     // Increment parent's replies Count
