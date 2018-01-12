@@ -12,7 +12,7 @@ $(() => {
     //--------------------
 
     // Add Option on pressing Enter while in Option Input
-    optionInput.keypress((event) => {
+    optionInput.keypress(event => {
         if (event.keyCode === 13)
             addOptionBtn.click();
     });
@@ -40,11 +40,11 @@ $(() => {
         $.post('/api/polls', {
             question: $('#question').val(),
             // Extract the options' texts from the Input List
-            options: $('.option').toArray().map((option) => {
+            options: $('.option').toArray().map(option => {
                 return $(option).text();
             })
         })
-        .then((data) => {
+        .then(data => {
             if(data.err)
                 throw new Error(data.err);
 
@@ -52,7 +52,7 @@ $(() => {
             console.log(data);
             window.location = data;
         })
-        .catch((err) => {
+        .catch(err => {
             // Else log the Error and Reload the Page
             // Reload to update the page with new Flash Message(if present)
             console.log("Error creating event!!");

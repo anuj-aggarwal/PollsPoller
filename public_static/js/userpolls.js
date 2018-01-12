@@ -18,14 +18,14 @@ function loadPolls(pollsContainer, sortBy) {
 
     // Get all polls of user from the Server sorted by sortBy
     $.get(`/api/users/${userId}/polls?sort=${sortBy}`)
-        .then((polls) => {
+        .then(polls => {
             if(polls.err)
                 throw new Error(polls.err);
 
             // Append the polls to the Polls Container
             appendPolls(pollsContainer, polls);
         })
-        .catch((err) => {
+        .catch(err => {
             console.log(err);
         });
 }
@@ -36,7 +36,7 @@ function appendPolls(pollsContainer, polls) {
     // Clear Container
     pollsContainer.html('');
     // Append each poll to the Polls Container
-    polls.forEach((poll) => {
+    polls.forEach(poll => {
         appendPoll(pollsContainer, poll);
     });
 }

@@ -156,7 +156,7 @@ function appendReply(outerCommentsBox, reply) {
                         url: `/api/replies/${reply._id}`,
                         type: 'PATCH',
                         data: {body: newReplyText}
-                    }).then((reply) => {
+                    }).then(reply => {
                         if (reply.err) {
                             // Hide the Spinner
                             editSpinner.hide();
@@ -178,7 +178,7 @@ function appendReply(outerCommentsBox, reply) {
                         // Enable the Edit Button
                         editReplyButton.css({pointerEvents: "auto", cursor: "pointer"});
                     })
-                        .catch((err) => {
+                        .catch(err => {
                             console.log(err);
                         })
                 }
@@ -222,7 +222,7 @@ function appendReply(outerCommentsBox, reply) {
                 type: 'DELETE',
                 data: requestBody
             })
-                .then((reply) => {
+                .then(reply => {
                     if (reply.err) {
                         deleteSpinner.hide();
                         deleteIcon.show();
@@ -236,7 +236,7 @@ function appendReply(outerCommentsBox, reply) {
                     // Remove the reply
                     comment.remove();
                 })
-                .catch((err) => {
+                .catch(err => {
                     console.log(err);
                 })
         }
@@ -244,14 +244,14 @@ function appendReply(outerCommentsBox, reply) {
 
     // Get the Replies of current Reply
     $.get(`/api/replies/${reply._id}/replies`)
-        .then((replies) => {
+        .then(replies => {
             // Append each reply to replies container
-            replies.forEach((innerReply) => {
+            replies.forEach(innerReply => {
                 appendReply(comments.children('.replies'), innerReply)
             });
             appendReplyForm(comments, reply._id);
         })
-        .catch((err) => {
+        .catch(err => {
             console.log(err);
         })
 }
@@ -260,7 +260,7 @@ function appendReply(outerCommentsBox, reply) {
 // uses appendReply()
 function showReplies(outerCommentsBox, replies) {
     // For each Reply in replies, append it to Comments Box
-    replies.forEach((reply) => {
+    replies.forEach(reply => {
         appendReply(outerCommentsBox, reply)
     });
 }
@@ -276,7 +276,7 @@ function updateReplies(pollId, outerCommentsBox, repliesSpinnerContainer) {
     setTimeout(() => {
         // Make AJAX Request to Server
         $.get(`/api/discussions/${pollId}/replies?skip=${repliesLoaded}&limit=${replyCount}`)
-            .then((replies) => {
+            .then(replies => {
                 // If Error not undefined, throw the Error to be catched in catch statement
                 if (replies.err)
                     throw new Error(replies.err);
@@ -294,7 +294,7 @@ function updateReplies(pollId, outerCommentsBox, repliesSpinnerContainer) {
                 if ($(window).height() >= $(document).height() && allRepliesLoaded === false)
                     updateReplies(pollId, outerCommentsBox, repliesSpinnerContainer);
             })
-            .catch((err) => {
+            .catch(err => {
                 // Log the Error if present
                 console.log("Error Extracting Replies");
             });
@@ -308,7 +308,7 @@ function reply(pollId, outerCommentsBox, replyText) {
     $.post(`/api/discussions/${pollId}/replies`, {
         body: replyText
     })
-        .then((reply) => {
+        .then(reply => {
             // If error present, throw it to be catched by outer catch statement
             if (reply.err)
                 throw new Error(reply.err);
@@ -316,7 +316,7 @@ function reply(pollId, outerCommentsBox, replyText) {
             // Append the new Reply to Comments Box
             appendReply(outerCommentsBox, reply);
         })
-        .catch((err) => {
+        .catch(err => {
             // Log the Error if present
             console.log(err);
         })
@@ -372,7 +372,7 @@ function appendReplyForm(comments, replyId) {
             $.post(`/api/replies/${replyId}/replies`, {
                 body: replyText
             })
-                .then((reply) => {
+                .then(reply => {
                     if (reply.err)
                         throw new Error(reply.err);
 
@@ -381,7 +381,7 @@ function appendReplyForm(comments, replyId) {
                     // Increment parent's replies Count
                     updateParentRepliesCount(comments.parent().children('.content').find('.replies-count'), 1);
                 })
-                .catch((err) => {
+                .catch(err => {
                     console.log(err);
                 });
             formTextArea.val('');
