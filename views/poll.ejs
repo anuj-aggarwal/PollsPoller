@@ -35,11 +35,12 @@
                                 </label>
                             </div>
                         </div>
-                    <!-- Else -->
                     <% } else { %>
+                        <!-- Else -->
                         <div class="option-item item">
                             <div class="ui radio checkbox">
-                                <input type="radio" name="option" value="<%= option._id %>" required <%= (user===undefined)?"disabled":"" %> >
+                                <input type="radio" name="option" value="<%= option._id %>"
+                                       required <%= (user === undefined) ? "disabled" : "" %> >
                                 <label class="option-body">
                                     <%= option.body %>
                                 </label>
@@ -50,7 +51,7 @@
             </div>
         </div>
 
-        <% if(user!==undefined) { %>
+        <% if(user !== undefined) { %>
             <!-- Vote Button: Enabled -->
             <button class="ui blue label">
                 Vote
@@ -58,7 +59,8 @@
             </button>
         <% } else { %>
             <!-- Vote Button: Disabled -->
-            <button class="ui disabled red label" data-inverted="" data-tooltip="Log In to Vote!" data-position="right center" disabled>
+            <button class="ui disabled red label" data-inverted="" data-tooltip="Log In to Vote!"
+                    data-position="right center" disabled>
                 Vote
                 <div class="detail"><%= poll.voteCount %></div>
             </button>

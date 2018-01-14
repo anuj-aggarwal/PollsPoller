@@ -115,7 +115,7 @@ route.post('/:id/votes', checkLoggedIn, (req,res)=>{
     // Redirect user to the polls page
     // TODO: Redirect to some other page depending on further use
     .then(poll => res.redirect(`/polls/${req.params.id}`))
-    .catch(err=>{
+    .catch(err =>{
         // Redirect user to the polls page
         // TODO: Redirect to some other page depending on further use
         console.log(err);

@@ -2,7 +2,7 @@
 const route = require("express").Router();
 
 // Require the DB Models
-const models = require('../models');
+const models = require("../models");
 
 
 //--------------------
@@ -10,16 +10,16 @@ const models = require('../models');
 //--------------------
 
 // GET Route for Discussion Page
-route.get('/:pollId', (req, res) => {
-    // Find the Poll with specified id in params
-    models.Poll.findById(req.params.pollId)
-        // If found, Render the Discussion Page
-        .then(poll => res.render('discussion', {poll}))
-        .catch(err => {
-            // Else redirect User to Index Page
-            console.log("Error: " + err);
-            res.redirect('/');
-        });
+route.get("/:pollId", (req, res) => {
+	// Find the Poll with specified id in params
+	models.Poll.findById(req.params.pollId)
+	// If found, Render the Discussion Page
+	      .then(poll => res.render("discussion", { poll }))
+	      .catch(err => {
+		      // Else redirect User to Index Page
+		      console.log("Error: " + err);
+		      res.redirect("/");
+	      });
 });
 
 

@@ -19,8 +19,7 @@
     cursor: pointer;
 }
 
-
-@keyframes spin{
+@keyframes spin {
     from {
         transform: rotate(0);
     }
@@ -29,7 +28,7 @@
     }
 }
 
-.edit-spinner{
+.edit-spinner {
     width: 16px;
     height: 16px;
     margin: 0;
