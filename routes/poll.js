@@ -32,8 +32,8 @@ route.get("/", (req, res) => {
 			break;
 	}
 
-	const page = req.query.page || 1;
-	const perPage = parseInt(req.query.perPage) || 10;
+	const page = parseInt(req.query.page) || 1;
+	const perPage = parseInt(req.query.perPage) || 1;
 	let polls;
 
 	// Get all the polls with question, author and voteCount only
@@ -54,7 +54,9 @@ route.get("/", (req, res) => {
 		      res.render("polls", {
 			      polls,
 			      page,
-			      pages: Math.ceil(count / perPage)
+			      perPage,
+			      pages: Math.ceil(count / perPage),
+			      sort: req.query.sort
 		      });
 	      })
 	      .catch(console.log);
