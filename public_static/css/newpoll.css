@@ -11,12 +11,15 @@
     color: #ff0000;
 }
 
-.ui.remove.icon:hover {
+.blue-hover:hover {
     cursor: pointer;
     color: #0000ff;
 }
 
-.edit-option:hover{
-    cursor: pointer;
-    color: #0000ff;
+.item:first-child .up-btn {
+    display: none;
+}
+
+.item:last-child .down-btn {
+    display: none;
 }

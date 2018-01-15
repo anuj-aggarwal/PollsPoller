@@ -23,13 +23,15 @@ $(() => {
             optionList.append(`
                 <div class="item">
                     <div class="ui grid">
-                        <div class="option thirteen wide column">
+                        <div class="option eleven wide column">
                             <div class="option-text">
                                 ${optionInput.val().trim()}
                             </div>
                         </div>
-                        <div class="one wide column"><i class="ui edit-option write icon" data-done="edit"></i></div>
-                        <div class="two wide column"><i class="delete-option ui remove icon"></i></div>
+                        <div class="one wide column"><i class="ui up-btn chevron up icon blue-hover"></i></div>
+                        <div class="one wide column"><i class="ui down-btn chevron down icon blue-hover"></i></div>
+                        <div class="one wide column"><i class="ui edit-option write icon blue-hover" data-done="edit"></i></div>
+                        <div class="two wide column"><i class="delete-option ui remove icon blue-hover"></i></div>
                     </div>
                 </div>
             `);
@@ -38,10 +40,10 @@ $(() => {
         // Initialize input value to ''
         optionInput.val('');
 
-        // Add Event Listeners to Delete Button
+        // Add Event Listeners
         addDeleteEvents();
-        // Add Event Listeners to Edit Button
         addEditEvents();
+        addUpDownArrowEvents();
     });
 
     // Send POST Request on Clicking Create Button
@@ -118,5 +120,29 @@ function addEditEvents() {
             //Update data-btn attribute
             editOptionBtn.data("done", "edit");
         }
+    })
+}
+
+// Function to add event listeners to Move option Up-Down
+function addUpDownArrowEvents() {
+    let upArrowBtn = $(".up-btn");
+    let downArrowBtn = $(".down-btn");
+
+    //Remove old event handlers
+    upArrowBtn.off('click');
+    downArrowBtn.off('click');
+
+
+    upArrowBtn.click(event => {
+        //Get current option
+        let currentOpt = $(event.target).closest(".item");
+        //Get previous sibling
+        currentOpt.prev().before(currentOpt);
+    });
+    downArrowBtn.click((event) => {
+        //Get current option
+        let currentOpt = $(event.target).closest(".item");
+        //Get next sibling
+        currentOpt.next().after(currentOpt);
     })
 }
