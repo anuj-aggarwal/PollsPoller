@@ -11,7 +11,7 @@ const { checkLoggedIn } = require("../helpers");
 //       ROUTES
 //--------------------
 
-// GET Route for all polls Page
+// GET Route for a page of all polls
 route.get("/", (req, res) => {
 
 	// Decide method for sorting(trending/recent/default)
@@ -32,15 +32,30 @@ route.get("/", (req, res) => {
 			break;
 	}
 
+	const page = req.query.page || 1;
+	const perPage = parseInt(req.query.perPage) || 10;
+	let polls;
+
 	// Get all the polls with question, author and voteCount only
 	models.Poll.find({}, "question author voteCount")
 	// Sort the polls according to sorting method
 	      .sort({ [sortBy]: "descending" })
+	      // Skip and limit to get desired range
+	      .skip(perPage * (page - 1))
+	      .limit(perPage)
 	      // Populate the username of the author
 	      .populate("author", "username")
+	      .then(ps => {
+		      polls = ps;
+		      return models.Poll.count();
+	      })
 	      // Send the Polls to user
-	      .then(polls => {
-		      res.render("polls", { polls });
+	      .then(count => {
+		      res.render("polls", {
+			      polls,
+			      page,
+			      pages: Math.ceil(count / perPage)
+		      });
 	      })
 	      .catch(console.log);
 });
