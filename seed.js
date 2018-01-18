@@ -16,10 +16,10 @@ mongoose.Promise = global.Promise;
 mongoose.connect(`mongodb://${CONFIG.DB.HOST}:${CONFIG.DB.PORT}/${CONFIG.DB.NAME}`, {
 	useMongoClient: true
 })
+        // Delete Old Data
         .then(() => {
 	        console.log(`Database ${CONFIG.DB.NAME} Ready for Use!`);
 
-	        // Delete Old Data present in Database
 	        console.log("Deleting Old Data...");
 	        return User.remove()
 	                   .then(() => {
@@ -29,30 +29,49 @@ mongoose.connect(`mongodb://${CONFIG.DB.HOST}:${CONFIG.DB.PORT}/${CONFIG.DB.NAME
 		                   return Reply.remove();
 	                   });
         })
+        // Start Seeding New Data
+        // Create Users and Their Polls
         .then(() => {
 	        console.log("Data Deleted successfully...");
 
 	        // Start Seeding new Data
 	        console.log("Starting Data Seeding.....");
 
-	        // Create 5 Users each with 10 polls
-	        console.log("Creating Users and Polls");
-	        let promises = [];
-	        for (let i = 0; i < 5; ++i) {
-		        promises.push(createUserAndPolls(i));
-	        }
-	        return Promise.all(promises);
+	        return createUsersAndPolls();
         })
+        // Create Replies on each Poll by each User
         .then(() => {
 	        console.log("Created Users and Polls successfully!");
 
+	        console.log("Starting Creation of Replies.....");
+	        return createReplies();
+        })
+        // Close the Connection
+        .then(() => {
+	        console.log("Replies created successfully!");
+
+	        console.log("Finished Seeding");
 	        // Close the connection with Database
 	        mongoose.connection.close();
         })
+        // Handle Errors
         .catch(err => {
 	        console.log(`Error Seeding Data: ${err}`);
         });
 
+
+// Function to create Users and their Polls
+// Returns a promise which resolves when all Users and their Polls are created
+// Uses: createUserAndPolls()
+function createUsersAndPolls() {
+	// Create 5 Users each with 10 polls
+	console.log("Creating Users and Polls");
+	let userPromises = [];
+	for (let i = 0; i < 5; ++i) {
+		userPromises.push(createUserAndPolls(i));
+	}
+	return Promise.all(userPromises);
+}
 
 // Function to create a User and all its polls
 // returns a promise which resolves when user and all its polls are created
@@ -66,9 +85,9 @@ function createUserAndPolls(i) {
 	})
 	           .then(user => {
 		           // Create all polls of User
-		           let promises = [];
+		           let pollPromises = [];
 		           for (let j = 0; j < 10; ++j) {
-			           promises.push(Poll.create({
+			           pollPromises.push(Poll.create({
 				           author: user._id,
 				           question: `Poll Question ${i}.${j}`,
 				           // Set votes for each option to 0
@@ -85,6 +104,44 @@ function createUserAndPolls(i) {
 			           }));
 		           }
 
+		           return Promise.all(pollPromises);
+	           });
+}
+
+
+// Function to Create Replies on each poll by each User
+// Returns a promise which resolves when all replies are created
+// Uses: createPollReplies()
+function createReplies() {
+	// Find all polls
+	return Poll.find()
+	           .then(polls => {
+		           // Create Reply by each User on the Poll using createPollReplies()
+		           let promises = polls.map(poll => createPollReplies(poll));
 		           return Promise.all(promises);
+	           });
+}
+
+
+// Function to add Replies to a poll
+// Returns a promise which resolves when all Replies are created on the poll
+function createPollReplies(poll) {
+	// Find all Users
+	return User.find()
+	           .then(users => {
+		           // Create a Reply on the Poll for each User
+		           let replyPromises = users.map(user => {
+			           return Reply.create({
+				           sender: user._id,
+				           body: `Reply By ${user.username}`
+			           });
+		           });
+		           return Promise.all(replyPromises);
+	           })
+	           .then(replies => {
+		           // Update the Poll with replies' ids
+		           // Add the new reply to poll's Replies
+		           replies.forEach(reply => poll.replies.push(reply._id));
+		           return poll.save();
 	           });
 }
