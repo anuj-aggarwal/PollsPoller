@@ -1,3 +1,3 @@
-$(()=>{
-    $('.ui.radio.checkbox').checkbox();
+$(() => {
+	$(".ui.radio.checkbox").checkbox();
 });

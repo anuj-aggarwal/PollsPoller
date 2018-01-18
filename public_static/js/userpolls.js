@@ -1,11 +1,11 @@
 $(() => {
-    const pollsContainer = $('#polls-container');
+	const pollsContainer = $("#polls-container");
 
-    // Get sorting method from polls Container
-    let sortBy = pollsContainer.data('sort');
+	// Get sorting method from polls Container
+	let sortBy = pollsContainer.data("sort");
 
-    // Load the user's polls from Server and update the DOM with the loaded polls
-    loadPolls(pollsContainer, sortBy);
+	// Load the user's polls from Server and update the DOM with the loaded polls
+	loadPolls(pollsContainer, sortBy);
 });
 
 
@@ -13,34 +13,33 @@ $(() => {
 // and update the Polls Container with the polls
 // Use appendPolls()
 function loadPolls(pollsContainer, sortBy) {
-    // Get user id
-    let userId = $('#username').data('user-id');
+	// Get user id
+	let userId = $("#username").data("user-id");
 
-    // Get all polls of user from the Server sorted by sortBy
-    $.get(`/api/users/${userId}/polls?sort=${sortBy}`)
-        .then((polls) => {
-            // Append the polls to the Polls Container
-            appendPolls(pollsContainer, polls);
-        })
-        .catch((err) => {
-            console.log(err);
-        });
+	// Get all polls of user from the Server sorted by sortBy
+	$.get(`/api/users/${userId}/polls?sort=${sortBy}`)
+	 .then(polls => {
+		 if (polls.err)
+			 throw new Error(polls.err);
+
+		 // Append the polls to the Polls Container
+		 appendPolls(pollsContainer, polls);
+	 })
+	 .catch(console.log);
 }
 
 // Function to append polls to the DOM
 // Use appendPoll()
 function appendPolls(pollsContainer, polls) {
-    // Clear Container
-    pollsContainer.html('');
-    // Append each poll to the Polls Container
-    polls.forEach((poll) => {
-        appendPoll(pollsContainer, poll);
-    });
+	// Clear Container
+	pollsContainer.html("");
+	// Append each poll to the Polls Container
+	polls.forEach(poll => appendPoll(pollsContainer, poll));
 }
 
 // Function to append Poll to the pollsContainer
 function appendPoll(pollContainer, poll) {
-    pollContainer.append(`
+	pollContainer.append(`
         <tr>
             <td>
                 <div class="ui header">

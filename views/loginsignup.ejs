@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<title>Polls Poller</title>
+    <meta charset="UTF-8">
+    <title>Polls Poller</title>
 
     <% include ./partials/header.ejs %>
 
-	<link rel="stylesheet" href="/css/loginsignup.css">
+    <link rel="stylesheet" href="/css/loginsignup.css">
 
 </head>
 <body>
@@ -16,53 +16,53 @@
 
 <!-- MAIN Container -->
 <div id="main-container" class="ui grid container">
-	<!-- Login Container -->
-	<div class="sixteen wide mobile eight wide computer column">
-		<div id="login-container" class="ui container">
-			<!-- Login Heading -->
-			<h1 class="header">Login</h1>
-			<!-- Login Form -->
-			<form action="/login" method="post" class="ui form">
-				<div class="field">
-					<label for="username">Username: </label>
-					<input type="text" id="login-username" name="username" required>
-				</div>
-				<div class="field">
-					<label for="password">Password: </label>
-					<input type="password" id="login-password" name="password" required>
-				</div>
-				<button class="ui primary button">Login</button>
-			</form>	<!-- Login Form End -->
-		</div>
-	</div><!-- END Login Container -->
+    <!-- Login Container -->
+    <div class="sixteen wide mobile eight wide computer column">
+        <div id="login-container" class="ui container">
+            <!-- Login Heading -->
+            <h1 class="header">Login</h1>
+            <!-- Login Form -->
+            <form action="/login" method="post" class="ui form">
+                <div class="field">
+                    <label for="username">Username: </label>
+                    <input type="text" id="login-username" name="username" required>
+                </div>
+                <div class="field">
+                    <label for="password">Password: </label>
+                    <input type="password" id="login-password" name="password" required>
+                </div>
+                <button class="ui primary button">Login</button>
+            </form>    <!-- Login Form End -->
+        </div>
+    </div><!-- END Login Container -->
 
-	<!-- Signup Container -->
-	<div class="sixteen wide mobile eight wide computer column">
-		<div id="signup-container" class="ui container">
-			<!-- Signup Heading -->
-			<h1 class="ui header">SignUp</h1>
-			<!-- SignUp Form -->
-			<form action="/signup" method="post" class="ui form">
-				<div class="field">
-					<label for="username">Username: </label>
-					<input type="text" id="signup-username" name="username" required>
-				</div>
-				<div class="field">
-					<label for="password">Password: </label>
-					<input type="password" id="signup-password" name="password" required>
-				</div>
-				<div class="field">
-					<label for="name">Name: </label>
-					<input type="text" id="name" name="name" required>
-				</div>
-				<div class="field">
-					<label for="email">Email Address: </label>
-					<input type="email" id="email" name="email" required>
-				</div>
-				<button class="ui primary button">SignUp</button>
-			</form> <!-- SignUp Form End -->
-		</div>
-	</div>	<!-- END Signup Container -->
+    <!-- Signup Container -->
+    <div class="sixteen wide mobile eight wide computer column">
+        <div id="signup-container" class="ui container">
+            <!-- Signup Heading -->
+            <h1 class="ui header">SignUp</h1>
+            <!-- SignUp Form -->
+            <form action="/signup" method="post" class="ui form">
+                <div class="field">
+                    <label for="username">Username: </label>
+                    <input type="text" id="signup-username" name="username" required>
+                </div>
+                <div class="field">
+                    <label for="password">Password: </label>
+                    <input type="password" id="signup-password" name="password" required>
+                </div>
+                <div class="field">
+                    <label for="name">Name: </label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="field">
+                    <label for="email">Email Address: </label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <button class="ui primary button">SignUp</button>
+            </form> <!-- SignUp Form End -->
+        </div>
+    </div>    <!-- END Signup Container -->
 </div>
 
 </body>

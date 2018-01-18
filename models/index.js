@@ -16,15 +16,15 @@ mongoose.Promise = global.Promise;
 
 // Connect to MongoDB Server
 mongoose.connect(`mongodb://${CONFIG.DB.HOST}:${CONFIG.DB.PORT}/${CONFIG.DB.NAME}`, {
-    useMongoClient: true
+	useMongoClient: true
 })
-.then(()=>{
-    console.log(`Database ${CONFIG.DB.NAME} Ready for Use!`);
-})
-.catch((err)=>{
-    console.log(`Error connecting to Database: ${err}`);
-});
+        .then(() => {
+	        console.log(`Database ${CONFIG.DB.NAME} Ready for Use!`);
+        })
+        .catch(err => {
+	        console.log(`Error connecting to Database: ${err}`);
+        });
 
 
 // Export all the Models
-module.exports = {User, Poll, Reply};
+module.exports = { User, Poll, Reply };

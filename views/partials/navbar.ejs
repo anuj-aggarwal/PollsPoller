@@ -3,8 +3,8 @@
     <div id="navbar-menu" class="ui inverted fixed menu">
         <!-- PollsPoller Heading and Logo -->
         <a href="/" id="brand-name" class="item">
-                <img id="navbar-logo" src="/img/logo.png">
-                &nbsp;Polls Poller
+            <img id="navbar-logo" src="/img/logo.png">
+            &nbsp;Polls Poller
         </a>
         <!-- Menu on Right -->
         <div class="right menu">
@@ -13,17 +13,17 @@
                 <span class="text">Polls</span>
                 <i class="dropdown icon"></i>
                 <div class="menu">
-                    <a href="/polls/show?sort=trending" class="item">Trending Polls</a>
-                    <a href="/polls/show?sort=recent" class="item">Recent Polls</a>
-                    <a href="/polls/show" class="item">All Polls</a>
+                    <a href="/polls?sort=trending" class="item">Trending Polls</a>
+                    <a href="/polls?sort=recent" class="item">Recent Polls</a>
+                    <a href="/polls" class="item">All Polls</a>
                 </div>
             </div>
             <!-- Login/Signup Dropdown -->
             <!-- Display Login/Signup if user not Logged in -->
             <% if(!user) { %>
                 <a href="/loginsignup" class="item">Login/Signup</a>
-            <% } else {%>
-            <!-- If logged in, display the Welcome dropdown -->
+            <% } else { %>
+                <!-- If logged in, display the Welcome dropdown -->
                 <div class="ui dropdown link item">
                     <span data-user-id="<%= user._id %>" id="username" class="text">Welcome <%= user.username %></span>
                     <i class="dropdown icon"></i>
