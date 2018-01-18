@@ -1,3 +1,7 @@
 a:hover {
     color: #fd573f;
 }
+
+#pagination .item:hover {
+    color: blue;
+}
