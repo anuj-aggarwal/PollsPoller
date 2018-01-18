@@ -6,3 +6,20 @@
 .option {
     overflow-wrap: break-word;
 }
+
+.ui.remove.icon {
+    color: #ff0000;
+}
+
+.blue-hover:hover {
+    cursor: pointer;
+    color: #0000ff;
+}
+
+.item:first-child .up-btn {
+    display: none;
+}
+
+.item:last-child .down-btn {
+    display: none;
+}
