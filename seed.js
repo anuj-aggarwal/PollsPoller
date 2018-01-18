@@ -44,7 +44,11 @@ mongoose.connect(`mongodb://${CONFIG.DB.HOST}:${CONFIG.DB.PORT}/${CONFIG.DB.NAME
 	        console.log("Created Users and Polls successfully!");
 
 	        console.log("Starting Creation of Replies.....");
-	        return createReplies();
+	        return createRepliesOnPolls();
+        })
+        // Create Replies on each Reply by each User
+        .then(() => {
+	        return createRepliesOnReplies();
         })
         // Close the Connection
         .then(() => {
@@ -112,7 +116,7 @@ function createUserAndPolls(i) {
 // Function to Create Replies on each poll by each User
 // Returns a promise which resolves when all replies are created
 // Uses: createPollReplies()
-function createReplies() {
+function createRepliesOnPolls() {
 	// Find all polls
 	return Poll.find()
 	           .then(polls => {
@@ -143,5 +147,43 @@ function createPollReplies(poll) {
 		           // Add the new reply to poll's Replies
 		           replies.forEach(reply => poll.replies.push(reply._id));
 		           return poll.save();
+	           });
+}
+
+
+// Function to Create Replies on each Reply by each User
+// Returns a promise which resolves when all replies are created
+// Uses: createReplyReplies()
+function createRepliesOnReplies() {
+	// Find all Replies
+	return Reply.find()
+	           .then(replies => {
+		           // Create Reply by each User on the Reply using createReplyReplies()
+		           let promises = replies.map(reply => createPollReplies(reply));
+		           return Promise.all(promises);
+	           });
+}
+
+
+// Function to add Replies to a reply
+// Returns a promise which resolves when all Replies are created on the reply
+function createReplyReplies(outerReply) {
+	// Find all Users
+	return User.find()
+	           .then(users => {
+		           // Create a Reply on the Reply for each User
+		           let replyPromises = users.map(user => {
+			           return Reply.create({
+				           sender: user._id,
+				           body: `Reply By ${user.username}`
+			           });
+		           });
+		           return Promise.all(replyPromises);
+	           })
+	           .then(replies => {
+		           // Update the Outer Reply with replies' ids
+		           // Add the new reply to Outer Reply's Replies
+		           replies.forEach(reply => outerReply.replies.push(reply._id));
+		           return outerReply.save();
 	           });
 }
