@@ -21,13 +21,7 @@ mongoose.connect(`mongodb://${CONFIG.DB.HOST}:${CONFIG.DB.PORT}/${CONFIG.DB.NAME
 	        console.log(`Database ${CONFIG.DB.NAME} Ready for Use!`);
 
 	        console.log("Deleting Old Data...");
-	        return User.remove()
-	                   .then(() => {
-		                   return Poll.remove();
-	                   })
-	                   .then(() => {
-		                   return Reply.remove();
-	                   });
+	        return clearDB();
         })
         // Start Seeding New Data
         // Create Users and Their Polls
@@ -43,18 +37,21 @@ mongoose.connect(`mongodb://${CONFIG.DB.HOST}:${CONFIG.DB.PORT}/${CONFIG.DB.NAME
         .then(() => {
 	        console.log("Created Users and Polls successfully!");
 
-	        console.log("Starting Creation of Replies.....");
+	        // Create Replies on each poll
 	        return createRepliesOnPolls();
         })
         // Create Replies on each Reply by each User
         .then(() => {
+        	console.log("Replies on Polls created successfully!");
+
+        	// Create Replies on each Reply
 	        return createRepliesOnReplies();
         })
         // Close the Connection
         .then(() => {
-	        console.log("Replies created successfully!");
+	        console.log("Replies on Replies created successfully!");
 
-	        console.log("Finished Seeding");
+	        console.log("Finished Seeding.....!!");
 	        // Close the connection with Database
 	        mongoose.connection.close();
         })
@@ -64,12 +61,23 @@ mongoose.connect(`mongodb://${CONFIG.DB.HOST}:${CONFIG.DB.PORT}/${CONFIG.DB.NAME
         });
 
 
+// Function to clear the Database
+function clearDB() {
+	return User.remove()
+		.then(()=>{
+			return Poll.remove();
+		})
+		.then(()=>{
+			return Reply.remove();
+		})
+}
+
 // Function to create Users and their Polls
 // Returns a promise which resolves when all Users and their Polls are created
 // Uses: createUserAndPolls()
 function createUsersAndPolls() {
 	// Create 5 Users each with 10 polls
-	console.log("Creating Users and Polls");
+	console.log("Creating Users and Polls...");
 	let userPromises = [];
 	for (let i = 0; i < 5; ++i) {
 		userPromises.push(createUserAndPolls(i));
@@ -117,6 +125,7 @@ function createUserAndPolls(i) {
 // Returns a promise which resolves when all replies are created
 // Uses: createPollReplies()
 function createRepliesOnPolls() {
+	console.log("Creating Replies on Polls.....");
 	// Find all polls
 	return Poll.find()
 	           .then(polls => {
@@ -155,6 +164,7 @@ function createPollReplies(poll) {
 // Returns a promise which resolves when all replies are created
 // Uses: createReplyReplies()
 function createRepliesOnReplies() {
+	console.log("Creating Replies on Replies.....");
 	// Find all Replies
 	return Reply.find()
 	           .then(replies => {
