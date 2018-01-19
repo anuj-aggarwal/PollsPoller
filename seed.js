@@ -42,14 +42,21 @@ mongoose.connect(`mongodb://${CONFIG.DB.HOST}:${CONFIG.DB.PORT}/${CONFIG.DB.NAME
         })
         // Create Replies on each Reply by each User
         .then(() => {
-        	console.log("Replies on Polls created successfully!");
+	        console.log("Replies on Polls created successfully!");
 
-        	// Create Replies on each Reply
+	        // Create Replies on each Reply
 	        return createRepliesOnReplies();
+        })
+        // Create Votes on Polls
+        .then(() => {
+	        console.log("Replies on Replies created successfully!");
+
+	        // Create Votes Randomly
+	        return createPollsVotes();
         })
         // Close the Connection
         .then(() => {
-	        console.log("Replies on Replies created successfully!");
+	        console.log("Completed Voting on Polls!");
 
 	        console.log("Finished Seeding.....!!");
 	        // Close the connection with Database
@@ -64,12 +71,12 @@ mongoose.connect(`mongodb://${CONFIG.DB.HOST}:${CONFIG.DB.PORT}/${CONFIG.DB.NAME
 // Function to clear the Database
 function clearDB() {
 	return User.remove()
-		.then(()=>{
-			return Poll.remove();
-		})
-		.then(()=>{
-			return Reply.remove();
-		})
+	           .then(() => {
+		           return Poll.remove();
+	           })
+	           .then(() => {
+		           return Reply.remove();
+	           });
 }
 
 // Function to create Users and their Polls
@@ -167,11 +174,11 @@ function createRepliesOnReplies() {
 	console.log("Creating Replies on Replies.....");
 	// Find all Replies
 	return Reply.find()
-	           .then(replies => {
-		           // Create Reply by each User on the Reply using createReplyReplies()
-		           let promises = replies.map(reply => createPollReplies(reply));
-		           return Promise.all(promises);
-	           });
+	            .then(replies => {
+		            // Create Reply by each User on the Reply using createReplyReplies()
+		            let promises = replies.map(reply => createPollReplies(reply));
+		            return Promise.all(promises);
+	            });
 }
 
 
@@ -196,4 +203,48 @@ function createReplyReplies(outerReply) {
 		           replies.forEach(reply => outerReply.replies.push(reply._id));
 		           return outerReply.save();
 	           });
+}
+
+
+// Function to create Random Votes on all the polls
+// Returns a Promise which resolves when all votes are added
+// Uses: createPollVotes()
+function createPollsVotes() {
+	console.log("Voting on Polls.....");
+
+	// Find All Users
+	let users;
+	return User.find()
+	           // Get all Polls
+	           .then(_users => {
+		           users = _users;
+		           return Poll.find();
+	           })
+	           .then(polls => {
+		           // For each poll, create new Votes
+		           let promises = polls.map(poll => {
+			           return createPollVotes(poll, users);
+		           });
+		           return Promise.all(promises);
+	           });
+}
+
+// Function to Vote on a Poll
+// Returns a Promise which resolves when voting on the poll is done
+function createPollVotes(poll, users) {
+	// For each User,
+	for (user of users) {
+		// Create Random Number to decide if current User has to poll on this poll
+		if (Math.round(Math.random()) === 1) {
+			// Vote on random option of the Poll
+			poll.votes.push({
+				voter: user._id,
+				option: poll.options[Math.floor(Math.random() * poll.options.length)]._id
+			});
+		}
+	}
+	// Update Votes Count
+	poll.voteCount = poll.votes.length;
+	// Save the Poll
+	return poll.save();
 }
