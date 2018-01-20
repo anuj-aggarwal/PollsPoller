@@ -19,47 +19,14 @@ mongoose.connect(`mongodb://${CONFIG.DB.HOST}:${CONFIG.DB.PORT}/${CONFIG.DB.NAME
         // Delete Old Data
         .then(() => {
 	        console.log(`Database ${CONFIG.DB.NAME} Ready for Use!`);
-
-	        console.log("Deleting Old Data...");
 	        return clearDB();
         })
         // Start Seeding New Data
-        // Create Users and Their Polls
         .then(() => {
-	        console.log("Data Deleted successfully...");
-
-	        // Start Seeding new Data
-	        console.log("Starting Data Seeding.....");
-
-	        return createUsersAndPolls();
-        })
-        // Create Replies on each Poll by each User
-        .then(() => {
-	        console.log("Created Users and Polls successfully!");
-
-	        // Create Replies on each poll
-	        return createRepliesOnPolls();
-        })
-        // Create Replies on each Reply by each User
-        .then(() => {
-	        console.log("Replies on Polls created successfully!");
-
-	        // Create Replies on each Reply
-	        return createRepliesOnReplies();
-        })
-        // Create Votes on Polls
-        .then(() => {
-	        console.log("Replies on Replies created successfully!");
-
-	        // Create Votes Randomly
-	        return createPollsVotes();
+	        return seedDB();
         })
         // Close the Connection
         .then(() => {
-	        console.log("Completed Voting on Polls!");
-
-	        console.log("Finished Seeding.....!!");
-	        // Close the connection with Database
 	        mongoose.connection.close();
         })
         // Handle Errors
@@ -70,13 +37,41 @@ mongoose.connect(`mongodb://${CONFIG.DB.HOST}:${CONFIG.DB.PORT}/${CONFIG.DB.NAME
 
 // Function to clear the Database
 function clearDB() {
+	console.log("Deleting Old Data...");
 	return User.remove()
 	           .then(() => {
 		           return Poll.remove();
 	           })
 	           .then(() => {
 		           return Reply.remove();
+	           })
+	           .then(() => {
+		           console.log("Data Deleted successfully...");
 	           });
+}
+
+
+// Function to seed the Database
+// Uses: createUsersAndPolls(), createRepliesOnPolls(), createRepliesOnReplies(), createPollsVotes()
+function seedDB() {
+	console.log("Starting Data Seeding.....");
+	// Create Users and Their Polls
+	return createUsersAndPolls()
+	// Create Replies on each Poll by each User
+		.then(() => {
+			return createRepliesOnPolls();
+		})
+		// Create Replies on each Reply by each User
+		.then(() => {
+			return createRepliesOnReplies();
+		})
+		// Create Votes on Polls randomly
+		.then(() => {
+			return createPollsVotes();
+		})
+		.then(() => {
+			console.log("Finished Seeding.....!!");
+		});
 }
 
 // Function to create Users and their Polls
@@ -89,7 +84,10 @@ function createUsersAndPolls() {
 	for (let i = 0; i < 5; ++i) {
 		userPromises.push(createUserAndPolls(i));
 	}
-	return Promise.all(userPromises);
+	return Promise.all(userPromises)
+	              .then(() => {
+		              console.log("Created Users and Polls successfully!");
+	              });
 }
 
 // Function to create a User and all its polls
@@ -139,6 +137,9 @@ function createRepliesOnPolls() {
 		           // Create Reply by each User on the Poll using createPollReplies()
 		           let promises = polls.map(poll => createPollReplies(poll));
 		           return Promise.all(promises);
+	           })
+	           .then(() => {
+		           console.log("Replies on Polls created successfully!");
 	           });
 }
 
@@ -178,6 +179,9 @@ function createRepliesOnReplies() {
 		            // Create Reply by each User on the Reply using createReplyReplies()
 		            let promises = replies.map(reply => createPollReplies(reply));
 		            return Promise.all(promises);
+	            })
+	            .then(() => {
+		            console.log("Replies on Replies created successfully!");
 	            });
 }
 
@@ -226,6 +230,9 @@ function createPollsVotes() {
 			           return createPollVotes(poll, users);
 		           });
 		           return Promise.all(promises);
+	           })
+	           .then(() => {
+		           console.log("Completed Voting on Polls!");
 	           });
 }
 
