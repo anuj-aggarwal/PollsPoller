@@ -23,7 +23,7 @@ mongoose.connect(`mongodb://${CONFIG.DB.HOST}:${CONFIG.DB.PORT}/${CONFIG.DB.NAME
         })
         // Start Seeding New Data
         .then(() => {
-	        return seedDB();
+	        return seedDB(5, 10);
         })
         // Close the Connection
         .then(() => {
@@ -51,12 +51,12 @@ function clearDB() {
 }
 
 
-// Function to seed the Database
+// Function to seed the Database with numUsers Users and numPolls Polls
 // Uses: createUsersAndPolls(), createRepliesOnPolls(), createRepliesOnReplies(), createPollsVotes()
-function seedDB() {
+function seedDB(numUsers, numPolls) {
 	console.log("Starting Data Seeding.....");
 	// Create Users and Their Polls
-	return createUsersAndPolls()
+	return createUsersAndPolls(numUsers, numPolls)
 	// Create Replies on each Poll by each User
 		.then(() => {
 			return createRepliesOnPolls();
@@ -74,25 +74,25 @@ function seedDB() {
 		});
 }
 
-// Function to create Users and their Polls
+// Function to create numUsers Users and their numPolls Polls
 // Returns a promise which resolves when all Users and their Polls are created
 // Uses: createUserAndPolls()
-function createUsersAndPolls() {
-	// Create 5 Users each with 10 polls
+function createUsersAndPolls(numUsers, numPolls) {
 	console.log("Creating Users and Polls...");
+
 	let userPromises = [];
-	for (let i = 0; i < 5; ++i) {
-		userPromises.push(createUserAndPolls(i));
+	for (let i = 0; i < numUsers; ++i) {
+		userPromises.push(createUserAndPolls(i, numPolls));
 	}
 	return Promise.all(userPromises)
 	              .then(() => {
-		              console.log("Created Users and Polls successfully!");
+		              console.log(`Created ${numUsers} Users and ${numPolls} Polls successfully!`);
 	              });
 }
 
 // Function to create a User and all its polls
 // returns a promise which resolves when user and all its polls are created
-function createUserAndPolls(i) {
+function createUserAndPolls(i, numPolls) {
 	// Create the User
 	return User.create({
 		username: `User${i}`,
@@ -103,7 +103,7 @@ function createUserAndPolls(i) {
 	           .then(user => {
 		           // Create all polls of User
 		           let pollPromises = [];
-		           for (let j = 0; j < 10; ++j) {
+		           for (let j = 0; j < numPolls; ++j) {
 			           pollPromises.push(Poll.create({
 				           author: user._id,
 				           question: `Poll Question ${i}.${j}`,
