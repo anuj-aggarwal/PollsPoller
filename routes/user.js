@@ -37,12 +37,20 @@ route.get("/:id/polls", checkLoggedIn, (req, res) => {
 			break;
 	}
 
+	const page = parseInt(req.query.page) || 1;
+	const perPage = parseInt(req.query.perPage) || 1;
+
+	let polls;
+
 	// Get all the polls with question, createdAt and voteCount only
 	models.Poll.find({
 		author: req.params.id
 	}, "question createdAt voteCount")
 	// Sort the polls according to sorting method
 	      .sort({ [sortBy]: "descending" })
+	      // Skip and limit to get the desired Range
+	      .skip(perPage * (page - 1))
+	      .limit(perPage)
 	      // Render the User Polls page
 	      .then(polls => {
 		      res.render("userpolls", { polls });
