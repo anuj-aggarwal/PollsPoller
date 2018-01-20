@@ -22,16 +22,13 @@ mongoose.connect(`mongodb://${CONFIG.DB.HOST}:${CONFIG.DB.PORT}/${CONFIG.DB.NAME
 	        return clearDB();
         })
         // Start Seeding New Data
-        .then(() => {
-	        return seedDB(5, 10);
-        })
+        .then(() => seedDB(5, 10))
         // Close the Connection
-        .then(() => {
-	        mongoose.connection.close();
-        })
-        // Handle Errors
+        .then(() => mongoose.connection.close())
+        // Handle Errors and close the connection
         .catch(err => {
 	        console.log(`Error Seeding Data: ${err}`);
+	        mongoose.connection.close();
         });
 
 
@@ -58,20 +55,12 @@ function seedDB(numUsers, numPolls) {
 	// Create Users and Their Polls
 	return createUsersAndPolls(numUsers, numPolls)
 	// Create Replies on each Poll by each User
-		.then(() => {
-			return createRepliesOnPolls();
-		})
+		.then(createRepliesOnPolls)
 		// Create Replies on each Reply by each User
-		.then(() => {
-			return createRepliesOnReplies();
-		})
+		.then(createRepliesOnReplies)
 		// Create Votes on Polls randomly
-		.then(() => {
-			return createPollsVotes();
-		})
-		.then(() => {
-			console.log("Finished Seeding.....!!");
-		});
+		.then(createPollsVotes)
+		.then(() => console.log("Finished Seeding.....!!"));
 }
 
 // Function to create numUsers Users and their numPolls Polls
@@ -85,9 +74,7 @@ function createUsersAndPolls(numUsers, numPolls) {
 		userPromises.push(createUserAndPolls(i, numPolls));
 	}
 	return Promise.all(userPromises)
-	              .then(() => {
-		              console.log(`Created ${numUsers} Users and ${numPolls} Polls successfully!`);
-	              });
+	              .then(() => console.log(`Created ${numUsers} Users and ${numPolls} Polls successfully!`));
 }
 
 // Function to create a User and all its polls
@@ -138,9 +125,7 @@ function createRepliesOnPolls() {
 		           let promises = polls.map(poll => createPollReplies(poll));
 		           return Promise.all(promises);
 	           })
-	           .then(() => {
-		           console.log("Replies on Polls created successfully!");
-	           });
+	           .then(() => console.log("Replies on Polls created successfully!"));
 }
 
 
@@ -180,9 +165,7 @@ function createRepliesOnReplies() {
 		            let promises = replies.map(reply => createPollReplies(reply));
 		            return Promise.all(promises);
 	            })
-	            .then(() => {
-		            console.log("Replies on Replies created successfully!");
-	            });
+	            .then(() => console.log("Replies on Replies created successfully!"));
 }
 
 
@@ -231,9 +214,7 @@ function createPollsVotes() {
 		           });
 		           return Promise.all(promises);
 	           })
-	           .then(() => {
-		           console.log("Completed Voting on Polls!");
-	           });
+	           .then(() => console.log("Completed Voting on Polls!"));
 }
 
 // Function to Vote on a Poll
