@@ -29,7 +29,7 @@
                     <% if(optionVoted === option._id.toString()) { %>
                         <div class="highlighted option-item item">
                             <div class="ui radio checkbox">
-                                <input type="radio" name="option" value="<%= option._id %>" required disabled checked>
+                                <input type="radio" value="<%= option._id %>" required disabled checked>
                                 <label class="option-body">
                                     <%= option.body %>
                                 </label>
