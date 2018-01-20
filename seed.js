@@ -35,16 +35,10 @@ mongoose.connect(`mongodb://${CONFIG.DB.HOST}:${CONFIG.DB.PORT}/${CONFIG.DB.NAME
 // Function to clear the Database
 function clearDB() {
 	console.log("Deleting Old Data...");
-	return User.remove()
-	           .then(() => {
-		           return Poll.remove();
-	           })
-	           .then(() => {
-		           return Reply.remove();
-	           })
-	           .then(() => {
-		           console.log("Data Deleted successfully...");
-	           });
+
+	// Clear all the three collections
+	return Promise.all([User.remove(), Poll.remove(), Reply.remove()])
+	              .then(() => console.log("Data Deleted Successfully!"));
 }
 
 
