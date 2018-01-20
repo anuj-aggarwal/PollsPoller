@@ -11,7 +11,7 @@ const { checkLoggedIn } = require("../helpers");
 //       ROUTES
 //--------------------
 
-// GET Route for all polls of user page
+// GET Route for all polls of User
 route.get("/:id/polls", checkLoggedIn, (req, res) => {
 	// Check if current user is not the same as Requesting User
 	if (req.user._id.toString() !== req.params.id) {
@@ -19,18 +19,37 @@ route.get("/:id/polls", checkLoggedIn, (req, res) => {
 		res.redirect("/");
 	}
 
-	// Check sorting method and render userpolls.ejs accordingly
-	if (req.query.sort) {
-		res.render("userpolls", {
-			sortBy: req.query.sort
-		});
+	// Decide method for sorting(trending/recent/default)
+	// from query parameter "sort"
+	let sortBy;
+	switch (req.query.sort) {
+		case "recent":
+			// recent sorted by last created
+			sortBy = "createdAt";
+			break;
+		case "trending":
+			// trending sorted by number of votes
+			sortBy = "voteCount";
+			break;
+		case "default":
+			// Default sorting by last updated
+			sortBy = "updatedAt";
+			break;
 	}
-	else {
-		res.render("userpolls", {
-			sortBy: "default"
-		});
-	}
+
+	// Get all the polls with question, createdAt and voteCount only
+	models.Poll.find({
+		author: req.params.id
+	}, "question createdAt voteCount")
+	// Sort the polls according to sorting method
+	      .sort({ [sortBy]: "descending" })
+	      // Render the User Polls page
+	      .then(polls => {
+		      res.render("userpolls", { polls });
+	      })
+	      .catch(console.log);
 });
+
 
 // Export the Router
 module.exports = route;
