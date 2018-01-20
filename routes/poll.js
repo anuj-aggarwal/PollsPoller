@@ -26,7 +26,7 @@ route.get("/", (req, res) => {
 			// trending sorted by number of votes
 			sortBy = "voteCount";
 			break;
-		case "default":
+		default:
 			// Default sorting by last updated
 			sortBy = "updatedAt";
 			break;
