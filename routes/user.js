@@ -51,9 +51,19 @@ route.get("/:id/polls", checkLoggedIn, (req, res) => {
 	      // Skip and limit to get the desired Range
 	      .skip(perPage * (page - 1))
 	      .limit(perPage)
+	      .then(_polls => {
+		      polls = _polls;
+		      return models.Poll.count({ author: req.params.id });
+	      })
 	      // Render the User Polls page
-	      .then(polls => {
-		      res.render("userpolls", { polls });
+	      .then(count => {
+		      res.render("userpolls", {
+			      polls,
+			      page,
+			      perPage,
+			      pages: Math.ceil(count / perPage),
+			      sort: req.query.sort
+		      });
 	      })
 	      .catch(console.log);
 });
