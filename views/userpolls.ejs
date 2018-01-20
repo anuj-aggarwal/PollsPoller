@@ -9,8 +9,6 @@
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="/css/polls.css">
-    <!-- Custom JS -->
-    <script src="/js/userpolls.js"></script>
 
 </head>
 <body>
@@ -30,8 +28,18 @@
         </thead>
         <!-- CONTAINER FOR ALL POLLS -->
         <!-- Contains sorting method for polls(trending/recent/default) -->
-        <tbody data-sort="<%= sortBy %>" id="polls-container">
-            <!-- Individual Polls to be added by JS -->
+        <tbody id="polls-container">
+            <% polls.forEach(poll => { %>
+                <tr>
+                    <td>
+                        <div class="ui header">
+                            <a href="/polls/<%= poll._id %>"><%= poll.question %></a>
+                            <div class="right aligned sub header"><%= poll.createdAt %></div>
+                        </div>
+                    </td>
+                    <td class="right aligned collapsing"><%= poll.voteCount %></td>
+                </tr>
+            <% }) %>
         </tbody>
 
         <!-- FOOTER containing Pagination -->
@@ -42,35 +50,54 @@
                     <div class="center aligned column">
                         <!-- PAGINATION MENU: Currently not functional -->
                         <div id="pagination" class="ui pagination menu">
-                            <!-- Pagination Left Control -->
-                            <a class="icon item">
-                                <i class="left chevron icon"></i>
-                            </a>
 
-                            <!-- Pagination Pages -->
-                            <a class="active item">
-                                1
-                            </a>
-                            <a class="item">
-                                2
-                            </a>
-                            <div class="disabled item">
-                                ...
-                            </div>
-                            <a class="item">
-                                8
-                            </a>
-                            <a class="item">
-                                9
-                            </a>
-                            <a class="item">
-                                10
-                            </a>
+                            <!-- PAGINATION LEFT CONTROLS -->
+                            <% if(page == 1) { %>
+                                <!-- Disabled if Page 1 -->
+                                <a class="disabled icon item"><i class="angle large double left icon"></i></a>
+                                <a class="disabled icon item"><i class="angle large left icon"></i></a>
+                            <% } else { %>
+                            <!-- Otherwise, enabled -->
+                                <a href="/users/<%= user._id %>/polls?sort=<%= sort %>&page=1&perPage=<%= perPage %>" class="icon item"><i class="angle large double left icon"></i></a>
+                                <a href="/users/<%= user._id %>/polls?sort=<%= sort %>&page=<%= page - 1 %>&perPage=<%= perPage %>" class="icon item"><i class="angle large left icon"></i></a>
+                            <% } %>
 
-                            <!-- Pagination Right Control -->
-                            <a class="icon item">
-                                <i class="right chevron icon"></i>
-                            </a>
+                            <!-- i: First Page to Display -->
+                            <% let i = (page > 3 ? page - 2 : 1); %>
+
+                            <!-- If pages not starting from 1 -->
+                            <!-- Display ... -->
+                            <% if (i !== 1) { %>
+                                <a class="disabled item">...</a>
+                            <% } %>
+
+                            <!-- Display all pages from first page(i) to last page(pages if page + 2 < pages) -->
+                            <% for (; i <= Math.min(page + 2, pages); ++i) { %>
+                                <!-- Current Page: Active -->
+                                <% if (i === page) { %>
+                                    <a class="active item"><%= i %></a>
+                                    <!-- Other Pages: not active -->
+                                <% } else { %>
+                                    <a href="/users/<%= user._id %>/polls?sort=<%= sort %>&page=<%= i %>&perPage=<%= perPage %>" class="item"><%= i %></a>
+                                <% } %>
+                            <% } %>
+
+                            <!-- If not reached last -->
+                            <% if (i <= pages) { %>
+                                <a class="disabled item">...</a>
+                            <% } %>
+
+                            <!-- PAGINATION RIGHT CONTROLS -->
+                            <% if (page === pages) { %>
+                                <!-- Disabled if Last Page -->
+                                <a class="disabled icon item"><i class="large angle right icon"></i></a>
+                                <a class="disabled icon item"><i class="large angle double right icon"></i></a>
+                            <% } else { %>
+                                <!-- Otherwise, Enabled -->
+                                <a href="/users/<%= user._id %>/polls?sort=<%= sort %>&page=<%= page + 1 %>&perPage=<%= perPage %>" class="icon item"><i class="large angle right icon"></i></a>
+                                <a href="/users/<%= user._id %>/polls?sort=<%= sort %>&page=<%= pages %>&perPage=<%= perPage %>" class="icon item"><i class="large angle double right icon"></i></a>
+                            <% } %>
+
                         </div>
                         <!-- END Pagination Menu -->
                     </div>
