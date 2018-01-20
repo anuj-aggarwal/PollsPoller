@@ -2,6 +2,6 @@ a:hover {
     color: #fd573f;
 }
 
-#pagination .item:hover {
+#pagination .item:not(.disabled):hover {
     color: blue;
 }
