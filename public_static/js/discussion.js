@@ -110,15 +110,15 @@ function appendReply(outerCommentsBox, reply) {
 	// Edit Button Spinner
 	let editSpinner = editReplyButton.find(".edit-spinner");
 	// Delete Button of current Reply
-	let deleteReplyButton = comment.children(".content").find(".delete-reply");
+	let deleteReplyButton = comment.children(".content").children(".delete-reply");
 	// Trash Icon for Delete
 	let deleteIcon = deleteReplyButton.find(".delete-icon");
 	// Delete Spinner
-	let deleteSpinner = comment.children(".content").find(".delete-spinner");
+	let deleteSpinner = comment.children(".content").children(".delete-spinner");
 
 
 	// Display Delete Button on Hovering the Reply
-	comment.children(".content").hover(deleteReplyButton.show, deleteReplyButton.hide);
+	comment.children(".content").hover(() => deleteReplyButton.show(), () => deleteReplyButton.hide());
 
 
 	// Toggle comments on clicking replies button
