@@ -70,6 +70,12 @@
 
     <!-- Link to Discussion -->
     <h3><a href="/discussions/<%= poll._id %>" class="ui button">Join the Discussion</a></h3>
+
+    <!-- Delete Button if User is same as Author -->
+    <% if(user && user._id.toString() === poll.author._id.toString()){ %>
+        <button id="delete-poll" class="ui tiny red button">Delete</button>
+    <% } %>
+
 </div>
 
 </body>
