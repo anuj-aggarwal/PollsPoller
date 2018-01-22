@@ -20,6 +20,34 @@ route.use("/", (req, res) => {
 	res.status(httpStatusCodes.NOT_FOUND).send({ err: httpStatusCodes.getStatusText(httpStatusCodes.NOT_FOUND) });
 });
 
+// ----------------------
+// Error handling Routes
+// ----------------------
+
+route.use((err, req, res, next) => {
+	console.error(err.stack);
+
+	// If Response already sent, don't send it again and move forward
+	if (res.headersSent)
+		return;
+
+	// Handling 4xx Errors: Render 400 page
+	if (err.status && err.status / 100 === 4) {
+		res.status(err.status).send({
+			err: err.message
+		});
+	}
+	else {
+		// Internal Server Error if no Error Code Stated
+		err.status = err.status || httpStatusCodes.INTERNAL_SERVER_ERROR;
+
+		// Handling other Errors(5xx): Render 500 Errors Page
+		res.status(err.status).send({
+			err: err.message
+		});
+	}
+});
+
 
 // Export the Router
 module.exports = route;
