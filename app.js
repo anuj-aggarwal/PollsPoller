@@ -6,6 +6,7 @@ const path = require("path");
 const bp = require("body-parser");
 const cp = require("cookie-parser");
 const session = require("express-session");
+const httpStatusCodes = require("http-status-codes");
 
 
 //--------------------
@@ -125,9 +126,9 @@ app.post("/signup", (req, res, next) => {
 // 404 ROUTES
 // Generic Route for all other Routes: Renders 404 Error Page
 app.use("/", (req, res) => {
-	res.status(404).render("error-pages/400", {
-		status: 404,
-		heading: "Not Found",
+	res.status(httpStatusCodes.NOT_FOUND).render("error-pages/400", {
+		status: httpStatusCodes.NOT_FOUND,
+		heading: httpStatusCodes.getStatusText(httpStatusCodes.NOT_FOUND),
 		description: ""
 	});
 });
