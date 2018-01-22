@@ -147,23 +147,26 @@ app.use((err, req, res, next) => {
 
 	// Handling 4xx Errors: Render 400 page
 	if (err.status && err.status / 100 === 4) {
-		res.status(err.status).render("error-pages/400", {
+		return res.status(err.status).render("error-pages/400", {
 			status: err.status,
 			heading: httpStatusCodes.getStatusText(err.status),
 			description: err.message
 		});
 	}
-	else {
-		// Internal Server Error if no Error Code Stated
-		err.status = err.status || httpStatusCodes.INTERNAL_SERVER_ERROR;
 
-		// Handling other Errors(5xx): Render 500 Errors Page
-		res.status(err.status).render("error-pages/500", {
-			status: err.status,
-			heading: httpStatusCodes.getStatusText(err.status),
-			description: err.message
-		});
-	}
+	// Internal Server Error if no Error Code Stated
+	err.status = err.status || httpStatusCodes.INTERNAL_SERVER_ERROR;
+
+	// Handle ReferenceErrors(caused if error in rendering ejs file: Hide the unnecessary details)
+	if (err instanceof ReferenceError)
+		err.message = "";
+
+	// Handling other Errors(5xx): Render 500 Errors Page
+	res.status(err.status).render("error-pages/500", {
+		status: err.status,
+		heading: httpStatusCodes.getStatusText(err.status),
+		description: err.message
+	});
 });
 
 
