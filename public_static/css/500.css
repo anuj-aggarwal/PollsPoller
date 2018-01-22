@@ -1,0 +1,30 @@
+/* Import Required Fonts */
+@import url('https://fonts.googleapis.com/css?family=Passero+One');
+
+/* Background Color to Body */
+body {
+    background-color: #f00a55;
+}
+
+/* Common Styles for Header */
+#header {
+    text-align: center;
+    color: white;
+}
+
+/* Font Size and Families for individual parts of header */
+#status {
+    font-size: 7em;
+    font-family: 'Passero One', cursive;
+}
+#heading {
+    font-size: 3em;
+    font-family: 'Passero One', cursive;
+}
+
+/* Description */
+#description {
+    text-align: center;
+    font-size: 1.5em;
+    padding-top: 1em;
+}
