@@ -122,6 +122,17 @@ app.post("/signup", (req, res, next) => {
 });
 
 
+// 404 ROUTES
+// Generic Route for all other Routes: Renders 404 Error Page
+app.use("/", (req, res) => {
+	res.status(404).render("error-pages/400", {
+		status: 404,
+		heading: "Not Found",
+		description: ""
+	});
+});
+
+
 // Listen at specified Port
 app.listen(CONFIG.SERVER.PORT, () => {
 	console.log(`Server started at http://${CONFIG.SERVER.HOST}:${CONFIG.SERVER.PORT}/`);
