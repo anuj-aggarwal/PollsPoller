@@ -1,10 +1,13 @@
+const httpStatusCodes = require("http-status-codes");
+
 // Check Logged in for Routes
 function checkLoggedIn(req, res, next) {
 	if (req.user)
 		next();
 	else {
-		console.log("Invalid Access!!");
-		res.redirect("/");
+		let err = new Error("You must be logged in to do that!");
+		err.status = httpStatusCodes.UNAUTHORIZED;
+		return next(err);
 	}
 }
 
@@ -13,8 +16,9 @@ function checkAPILoggedIn(req, res, next) {
 	if (req.user)
 		next();
 	else {
-		console.log("Invalid Access!!");
-		res.send({ err: "User not logged in!!" });
+		let err = new Error("Your must be logged in to do that!");
+		err.status = httpStatusCodes.UNAUTHORIZED;
+		return next(err);
 	}
 }
 

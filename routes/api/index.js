@@ -32,7 +32,7 @@ route.use((err, req, res, next) => {
 		return;
 
 	// Handling 4xx Errors: Render 400 page
-	if (err.status && err.status / 100 === 4) {
+	if (err.status && Math.floor(err.status / 100) === 4) {
 		res.status(err.status).send({
 			err: err.message
 		});
