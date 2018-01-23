@@ -1,3 +1,4 @@
+const httpStatusCodes = require("http-status-codes");
 // Create a new Express Router
 const route = require("express").Router();
 
@@ -12,7 +13,18 @@ const { checkAPILoggedIn } = require("../../helpers");
 //--------------------
 
 // POST Route for Creating new Poll
-route.post("/", checkAPILoggedIn, (req, res) => {
+route.post("/", checkAPILoggedIn, (req, res, next) => {
+	if (!req.body.question || !req.body.options) {
+		let err = new Error("Poll Body Incomplete!!");
+		err.status = httpStatusCodes.BAD_REQUEST;
+		return next(err);
+	}
+	if (!(req.body.options instanceof Array)) {
+		let err = new Error("Options must be an Array!!");
+		err.status = httpStatusCodes.BAD_REQUEST;
+		return next(err);
+	}
+
 	// Create a new Poll
 	models.Poll.create({
 		author: req.user._id,
@@ -30,25 +42,29 @@ route.post("/", checkAPILoggedIn, (req, res) => {
 	})
 	// Send the new Poll's Address to the User
 	      .then(poll => res.send(`/polls/${poll._id}`))
-	      .catch(err => {
-		      // If error, redirect on the Same Page
-		      console.log(`Error! ${err}`);
-		      res.send("/polls/new");
-	      });
+	      .catch(next);
 });
 
 
 // Delete Route for Poll
-route.delete("/:id", checkAPILoggedIn, (req, res) => {
+route.delete("/:id", checkAPILoggedIn, (req, res, next) => {
 	let replies = [];
 
 	// Find the Poll
 	models.Poll.findById(req.params.id)
 	      .then(poll => {
-		      // If Author is the same as Current User
+		      // If poll not found
+		      if (!poll) {
+			      let err = new Error("Poll does not exists!!");
+			      err.status = httpStatusCodes.NOT_FOUND;
+			      return next(err);
+		      }
+
+		      // If Author is not the same as Current User
 		      if (poll.author.toString() !== req.user._id.toString()) {
-			      res.send({ err: "Can't Delete Other User's Poll" });
-			      throw new Error("Invalid Access!");
+			      let err = new Error("Can't Delete Other User's Poll");
+			      err.status = httpStatusCodes.UNAUTHORIZED;
+			      return next(err);
 		      }
 
 		      // Save the Replies of User for Delete
@@ -69,7 +85,7 @@ route.delete("/:id", checkAPILoggedIn, (req, res) => {
 	      .then(() => {
 		      console.log("Successfully Deleted all replies of Poll: " + req.params.id);
 	      })
-	      .catch(console.log);
+	      .catch(next);
 });
 
 
@@ -89,6 +105,11 @@ function deleteReplyAndChildren(replyId) {
 	// Find the reply
 	return models.Reply.findById(replyId)
 	             .then(reply => {
+		             // If Reply not found
+		             if (!reply) {
+			             throw new Error(`Reply with id: ${replyId} does not exists`);
+		             }
+
 		             // Delete Inner(Children) Replies
 		             let promises = reply.replies.map(reply => deleteReplyAndChildren(reply));
 		             return Promise.all(promises);
