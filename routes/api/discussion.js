@@ -46,13 +46,13 @@ route.post("/:pollId/replies", checkAPILoggedIn, (req, res, next) => {
 // Get Route for All Replies of a Discussion
 route.get("/:pollId/replies", (req, res, next) => {
 	let skip = parseInt(req.query.skip);
-	if(!skip || skip < 0) {
+	if(isNaN(skip) || skip < 0) {
 		let err = new Error("Invalid skip value");
 		err.status = httpStatusCodes.BAD_REQUEST;
 		return next(err);
 	}
 	let limit = parseInt(req.query.limit);
-	if(!limit || limit < 0) {
+	if(isNaN(limit) || limit < 0) {
 		let err = new Error("Invalid limit value");
 		err.status = httpStatusCodes.BAD_REQUEST;
 		return next(err);
