@@ -114,10 +114,25 @@ route.get("/:id", (req, res, next) => {
 
 
 // POST Route to Vote
-route.post("/:id/votes", checkLoggedIn, (req, res) => {
+route.post("/:id/votes", checkLoggedIn, (req, res, next) => {
 	// Find the Poll
 	models.Poll.findById(req.params.id)
 	      .then(poll => {
+		      if (!poll) {
+			      let err = new Error("Poll does not exists!");
+			      err.status = httpStatusCodes.NOT_FOUND;
+			      return next(err);
+		      }
+
+		      // If request does not contain a valid option
+		      // Find option to vote in poll's options
+		      let matchedOptions = poll.options.filter(option => (option._id.toString() === req.body.option));
+		      if(matchedOptions.length === 0) {
+		      	let err = new Error("Not a Valid Option!!");
+		      	err.status = httpStatusCodes.UNPROCESSABLE_ENTITY;
+		      	return next(err);
+		      }
+
 		      // Find if User has already Voted on the Poll
 		      let vote = poll.votes.filter(vote => {
 			      // Compare the ids of vote and user Id
@@ -162,15 +177,9 @@ route.post("/:id/votes", checkLoggedIn, (req, res) => {
 			      return poll.save();
 		      }
 	      })
-	      // Redirect user to the polls page
-	      // TODO: Redirect to some other page depending on further use
+	      // Redirect user to the poll's page
 	      .then(poll => res.redirect(`/polls/${req.params.id}`))
-	      .catch(err => {
-		      // Redirect user to the polls page
-		      // TODO: Redirect to some other page depending on further use
-		      console.log(err);
-		      res.redirect(`/polls/${req.params.id}`);
-	      });
+	      .catch(next);
 });
 
 
