@@ -146,7 +146,7 @@ app.use((err, req, res, next) => {
 		return;
 
 	// Handling 4xx Errors: Render 400 page
-	if (err.status && err.status / 100 === 4) {
+	if (err.status && Math.floor(err.status / 100) === 4) {
 		return res.status(err.status).render("error-pages/400", {
 			status: err.status,
 			heading: httpStatusCodes.getStatusText(err.status),
