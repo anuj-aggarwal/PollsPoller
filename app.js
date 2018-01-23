@@ -100,8 +100,11 @@ app.post("/signup", (req, res, next) => {
 				      email: req.body.email
 			      });
 		      // Otherwise throw error if user exists
-		      else
-			      throw Error("User already Exists");
+		      else {
+			      let err = new Error("User already exists!");
+			      err.status = httpStatusCodes.CONFLICT;
+			      return next(err);
+		      }
 	      })
 	      .then(user => {
 		      // Redirect to Login/SignUp Page
@@ -115,11 +118,7 @@ app.post("/signup", (req, res, next) => {
 		      })(req, res, next);
 
 	      })
-	      .catch(err => {
-		      // Redirect to Home Page
-		      console.log(err);
-		      res.redirect("/");
-	      });
+	      .catch(next);
 });
 
 

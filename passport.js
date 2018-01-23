@@ -36,7 +36,7 @@ const localStrategy = new LocalStrategy((username, password, done) => {
 	      })
 	      .catch(err => {
 		      // Log the Error and call done
-		      console.log("ERROR");
+		      console.error("Error while validating User!");
 		      done(err);
 	      });
 });
