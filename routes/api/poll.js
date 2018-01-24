@@ -28,11 +28,11 @@ route.post("/", checkAPILoggedIn, (req, res, next) => {
 	// Create a new Poll
 	models.Poll.create({
 		author: req.user._id,
-		question: req.body.question,
+		question: req.body.question.toString(),
 		// Set votes for each option to 0
 		options: req.body.options.map(option => {
 			return {
-				body: option,
+				body: option.toString(),
 				votes: 0
 			};
 		}),

@@ -14,6 +14,12 @@ const { checkAPILoggedIn } = require("../../helpers");
 
 // POST Route for Replying to Discussion(not to another reply)
 route.post("/:pollId/replies", checkAPILoggedIn, (req, res, next) => {
+	if(!req.body.body) {
+		let err = new Error("Reply text not present!");
+		err.status = httpStatusCodes.BAD_REQUEST;
+		return next(err);
+	}
+
 	// Find the poll to reply on
 	models.Poll.findById(req.params.pollId)
 	      .then(poll => {
@@ -26,7 +32,7 @@ route.post("/:pollId/replies", checkAPILoggedIn, (req, res, next) => {
 		      // Create new Reply
 		      let reply = models.Reply.create({
 			      sender: req.user._id,
-			      body: req.body.body
+			      body: req.body.body.toString()
 		      })
 		                        .then(reply => {
 			                        // Add the new reply to poll's Replies

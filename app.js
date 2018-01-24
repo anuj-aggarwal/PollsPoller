@@ -86,6 +86,12 @@ app.get("/logout", (req, res) => {
 
 // Signup POST Request
 app.post("/signup", (req, res, next) => {
+	if (!req.body.username || !req.body.password || !req.body.name || !req.body.email) {
+		let err = new Error("Incomplete Details!");
+		err.status = httpStatusCodes.BAD_REQUEST;
+		return next(err);
+	}
+
 	// Find the User if already exists
 	models.User.findOne({
 		username: req.body.username
