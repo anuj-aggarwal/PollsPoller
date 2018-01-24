@@ -116,6 +116,9 @@ function deleteReplyAndChildren(replyId) {
 	// Find the reply
 	return models.Reply.findById(replyId)
 	             .then(reply => {
+		             if (!reply)
+			             throw new Error(`Reply with id: ${replyId} not found!`);
+
 		             // Delete Inner(Children) Replies
 		             let promises = reply.replies.map(reply => deleteReplyAndChildren(reply));
 		             return Promise.all(promises);
@@ -127,22 +130,41 @@ function deleteReplyAndChildren(replyId) {
 }
 
 // DELETE Request to delete a reply
-route.delete("/:id", checkAPILoggedIn, (req, res) => {
+route.delete("/:id", checkAPILoggedIn, (req, res, next) => {
+	if ((!req.body.outerReplyId && !req.body.pollId) || (req.body.outerReplyId && req.body.pollId)) {
+		let err = new Error("Invalid Body!");
+		err.status = httpStatusCodes.BAD_REQUEST;
+		return next(err);
+	}
+
 	// Find id the reply is of user only
 	models.Reply.findById(req.params.id)
 	      .select("sender")
 	      .then(reply => {
+		      if (!reply) {
+			      let err = new Error(`Reply with id: ${req.params.id} not found!`);
+			      err.status = httpStatusCodes.NOT_FOUND;
+			      return next(err);
+		      }
+
 		      if (reply.sender.toString() !== req.user._id.toString()) {
-			      res.send({ err: "Can't Delete other user's reply" });
-			      throw Error("Invalid Access!!");
+			      let err = new Error("Can't Delete other User's Reply!");
+			      err.status = httpStatusCodes.UNAUTHORIZED;
+			      return next(err);
 		      }
 	      })
 	      .then(() => {
 		      // If reply is inner reply
 		      if (req.body.outerReplyId !== undefined) {
 			      // Find the outer Reply
-			      models.Reply.findById(req.body.outerReplyId)
+			      models.Reply.findById(req.body.outerReplyId.toString())
 			            .then(outerReply => {
+				            if (!outerReply) {
+					            let err = new Error("Outer Reply not found!!");
+					            err.status = httpStatusCodes.NOT_FOUND;
+					            return next(err);
+				            }
+
 				            // Remove the Reply from outerReply's replies
 				            outerReply.replies = outerReply.replies.filter(reply => (reply.toString() !== req.params.id));
 				            return outerReply.save();
@@ -151,13 +173,19 @@ route.delete("/:id", checkAPILoggedIn, (req, res) => {
 			            .then(() => deleteReplyAndChildren(req.params.id))
 			            // Send the deleted reply to user
 			            .then(reply => res.send(reply))
-			            .catch(console.log);
+			            .catch(next);
 		      }
 		      // else, if reply is outermost reply
 		      else {
 			      // Find the Poll
-			      models.Poll.findById(req.body.pollId)
+			      models.Poll.findById(req.body.pollId.toString())
 			            .then(poll => {
+				            if (!poll) {
+					            let err = new Error("Poll does not exists!");
+					            err.status = httpStatusCodes.NOT_FOUND;
+					            return next(err);
+				            }
+
 				            // Remove the Reply from Poll's replies
 				            poll.replies = poll.replies.filter(reply => (reply.toString() !== req.params.id));
 				            return poll.save();
@@ -168,7 +196,7 @@ route.delete("/:id", checkAPILoggedIn, (req, res) => {
 			            .then(reply => res.send(reply));
 		      }
 	      })
-	      .catch(console.log);
+	      .catch(next);
 });
 
 // Export the Router
