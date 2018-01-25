@@ -30,7 +30,10 @@
         </div>
 
         <!-- Load Replies Spinner -->
-        <div id="spinner-container" style="display:none;"><i id="replies-spinner" class="big spinner icon"></i></div>
+        <div id="spinner-container" style="display:none;">
+            <i id="replies-spinner" class="big spinner icon"></i>
+            <span id="replies-error-icon" data-inverted="" data-tooltip="Error Loading Replies" data-position="bottom center" style="display: none;"><i class="big warning sign icon"></i></span>
+        </div>
 
         <% if(user) { %>
             <!-- Outermost Reply Form -->

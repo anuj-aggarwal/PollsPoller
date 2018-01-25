@@ -13,6 +13,10 @@ $(() => {
 	const outerReplyButton = $(".outer-reply-button");
 	// Replies Spinner Container
 	const repliesSpinnerContainer = $("#spinner-container");
+	// Replies Spinner
+	const repliesSpinner = $("#replies-spinner");
+	// Replies Error icon
+	const repliesErrorIcon = $("#replies-error-icon");
 
 	// Clear Previous Replies if present
 	outerCommentsBox.html("");
@@ -32,7 +36,6 @@ $(() => {
 		}
 	});
 
-
 	/********************
 	 *  Event Listeners  *
 	 *********************/
@@ -47,6 +50,10 @@ $(() => {
 			// Clear the Text Area's Value
 			outerReplyTextArea.val("");
 		}
+	});
+
+	repliesErrorIcon.click(() => {
+		updateReplies(pollId, outerCommentsBox, repliesSpinnerContainer);
 	});
 });
 
@@ -282,7 +289,14 @@ function showReplies(outerCommentsBox, replies) {
 // and updates the CommentsBox
 // uses showReplies()Container, innerReply);
 function updateReplies(pollId, outerCommentsBox, repliesSpinnerContainer) {
+	// Replies Spinner
+	const repliesSpinner = repliesSpinnerContainer.find("#replies-spinner");
+	// Replies Error Icon
+	const repliesErrorIcon = repliesSpinnerContainer.find("#replies-error-icon");
+
 	// Show the Replies spinner
+	repliesErrorIcon.hide();
+	repliesSpinner.show();
 	repliesSpinnerContainer.show();
 
 	// Create a delay for spinner to show
@@ -290,9 +304,6 @@ function updateReplies(pollId, outerCommentsBox, repliesSpinnerContainer) {
 		// Make AJAX Request to Server
 		$.get(`/api/discussions/${pollId}/replies?skip=${repliesLoaded}&limit=${replyCount}`)
 		 .then(replies => {
-			 // If Error not undefined, throw the Error to be catched in catch statement
-			 if (replies.err)
-				 throw new Error(replies.err);
 
 			 repliesLoaded += replies.length;
 			 if (replies.length === 0)
@@ -308,7 +319,12 @@ function updateReplies(pollId, outerCommentsBox, repliesSpinnerContainer) {
 				 updateReplies(pollId, outerCommentsBox, repliesSpinnerContainer);
 		 })
 		 // Log the Error if present
-		 .catch(err => console.log("Error Extracting Replies"));
+		 .catch(err => {
+			 console.error("Error Extracting Replies!");
+			 console.error(err);
+			 repliesSpinner.hide();
+			 repliesErrorIcon.show();
+		 });
 	}, 500);
 }
 
