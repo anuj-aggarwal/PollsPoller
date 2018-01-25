@@ -69,6 +69,10 @@ function appendReply(outerCommentsBox, reply) {
                             </a>                  
                         ` : "" }
                     <i class="delete-spinner large red spinner icon" style="display:none"></i>
+                    <span class="delete-error-icon" data-inverted="" data-tooltip="Oops, Something went Wrong!" data-position="left center" style="display:none;">
+                        <i class="large warning sign icon"></i>
+                    </span>
+                    
                     <!-- Text -->
                     <div class="text">
                         ${reply.body}
@@ -116,6 +120,8 @@ function appendReply(outerCommentsBox, reply) {
 	let deleteIcon = deleteReplyButton.find(".delete-icon");
 	// Delete Spinner
 	let deleteSpinner = comment.children(".content").children(".delete-spinner");
+	// Delete Error Icon
+	let deleteErrorIcon = comment.children(".content").children(".delete-error-icon");
 
 
 	// Display Delete Button on Hovering the Reply
@@ -166,6 +172,8 @@ function appendReply(outerCommentsBox, reply) {
 						 editReplyButton.css({ pointerEvents: "auto", cursor: "pointer" });
 					 })
 					 .catch(err => {
+						 console.error(err);
+
 						 // Hide the Spinner
 						 editSpinner.hide();
 
@@ -223,12 +231,6 @@ function appendReply(outerCommentsBox, reply) {
 				data: requestBody
 			})
 			 .then(reply => {
-				 if (reply.err) {
-					 deleteSpinner.hide();
-					 deleteIcon.show();
-					 throw new Error(reply.err);
-				 }
-
 				 console.log("Deleted: ");
 				 console.log(reply);
 				 // Update replies count of parent reply(if exists)
@@ -236,9 +238,28 @@ function appendReply(outerCommentsBox, reply) {
 				 // Remove the reply
 				 comment.remove();
 			 })
-			 .catch(console.log);
+			 .catch(err => {
+				 console.error(err);
+
+				 // Hide the spinner
+				 deleteSpinner.hide();
+
+				 // Show Error Icon with message in tooltip
+				 if (err.responseJSON && err.responseJSON.err)
+					 deleteErrorIcon.attr("data-tooltip", err.responseJSON.err);
+				 else
+					 deleteErrorIcon.attr("data-tooltip", "Oops, something went wrong!");
+				 deleteErrorIcon.show();
+			 });
 		}
 	});
+
+	// Show Delete Icon on clicking Delete Error Icon
+	deleteErrorIcon.click(() => {
+		deleteErrorIcon.hide();
+		deleteIcon.show();
+	});
+
 
 	// Get the Replies of current Reply
 	$.get(`/api/replies/${reply._id}/replies`)

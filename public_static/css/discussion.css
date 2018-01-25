@@ -52,3 +52,7 @@
 .warning.sign.icon {
     color: red;
 }
+
+.delete-error-icon {
+    float: right;
+}
