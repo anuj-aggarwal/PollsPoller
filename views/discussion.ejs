@@ -46,6 +46,10 @@
                 <div class="ui blue labeled submit icon button outer-reply-button">
                     <i class="icon edit"></i> Add Reply
                 </div>
+                <i id="outer-form-loader" class="large circle notched loading icon" style="display: none;"></i>
+                <span id="outer-form-error" data-inverted="" data-tooltip="Error Replying to Discussion!" data-position="right center" style="display: none;">
+                    <i class="large warning sign icon"></i>
+                </span>
             </form>
         <% } else { %>
             <!-- Outermost Reply Form -->

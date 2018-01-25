@@ -11,6 +11,10 @@ $(() => {
 	const outerReplyTextArea = $(".outer-reply-text");
 	// Outermost Reply Form's Reply Button
 	const outerReplyButton = $(".outer-reply-button");
+	// Outer Form's Loader
+	const outerFormLoader = $("#outer-form-loader");
+	// Outer Form's Error Icon
+	const outerFormError = $("#outer-form-error");
 	// Replies Spinner Container
 	const repliesSpinnerContainer = $("#spinner-container");
 	// Replies Spinner
@@ -46,7 +50,7 @@ $(() => {
 		let replyText = outerReplyTextArea.val().trim();
 		if (replyText !== "") {
 			// make reply, and append it
-			reply(pollId, outerCommentsBox, replyText);
+			reply(pollId, outerCommentsBox, replyText, outerFormLoader, outerFormError);
 			// Clear the Text Area's Value
 			outerReplyTextArea.val("");
 		}
@@ -330,21 +334,31 @@ function updateReplies(pollId, outerCommentsBox, repliesSpinnerContainer) {
 
 // function to Make a POST AJAX request to Server to make a reply
 // and append the new reply returned to the comments Box
-function reply(pollId, outerCommentsBox, replyText) {
+function reply(pollId, outerCommentsBox, replyText, outerFormLoader, outerFormError) {
+	outerFormError.hide();
+	outerFormLoader.show();
+
 	// Make an AJAX Request with TextArea's Value
 	$.post(`/api/discussions/${pollId}/replies`, {
 		body: replyText
 	})
 	 .then(reply => {
-		 // If error present, throw it to be catched by outer catch statement
-		 if (reply.err)
-			 throw new Error(reply.err);
+		 outerFormLoader.hide();
 
 		 // Append the new Reply to Comments Box
 		 appendReply(outerCommentsBox, reply);
 	 })
 	 // Log the Error if present
-	 .catch(console.log);
+	 .catch(err => {
+		 console.error(err);
+		 outerFormLoader.hide();
+
+		 if (err.responseJSON && err.responseJSON.err)
+			 outerFormError.attr("data-tooltip", err.responseJSON.err);
+		 else
+			 outerFormError.attr("data-tooltip", "Error Replying to Discussion!");
+		 outerFormError.show();
+	 });
 }
 
 
