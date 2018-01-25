@@ -67,8 +67,7 @@ function appendReply(outerCommentsBox, reply) {
                             <a class="delete-reply" style="display: none;">
                                 <i class="delete-icon large trash icon"></i>
                             </a>                  
-                        ` : ""
-		}
+                        ` : "" }
                     <i class="delete-spinner large red spinner icon" style="display:none"></i>
                     <!-- Text -->
                     <div class="text">
@@ -82,9 +81,9 @@ function appendReply(outerCommentsBox, reply) {
                                     <span class="edit-display">Edit</span>
                                     <!-- Spinner: Initially hidden -->
                                     <i class="edit-spinner spinner icon" style="display:none"></i>
+                                    <span class="edit-error-icon" data-inverted="" data-tooltip="Oops, Something went Wrong!" data-position="right center" style="display:none;"><i class="warning sign icon"></i></span>
                                 </a>                    
-                            ` : ""
-		}
+                            ` : "" }
                     </div>
                 </div>
                 
@@ -109,6 +108,8 @@ function appendReply(outerCommentsBox, reply) {
 	let editDisplay = editReplyButton.find(".edit-display");
 	// Edit Button Spinner
 	let editSpinner = editReplyButton.find(".edit-spinner");
+	// Edit Error Icon
+	let editErrorIcon = editReplyButton.find(".edit-error-icon");
 	// Delete Button of current Reply
 	let deleteReplyButton = comment.children(".content").children(".delete-reply");
 	// Trash Icon for Delete
@@ -131,6 +132,7 @@ function appendReply(outerCommentsBox, reply) {
 
 		// If the button is Done Button
 		if (editReplyButton.data("done")) {
+			editErrorIcon.hide();
 
 			// Get the new reply text
 			let newReplyText = replyText.text().trim();
@@ -152,16 +154,6 @@ function appendReply(outerCommentsBox, reply) {
 						data: { body: newReplyText }
 					})
 					 .then(reply => {
-						 if (reply.err) {
-							 // Hide the Spinner
-							 editSpinner.hide();
-							 // Enable the Edit Button
-							 editReplyButton.css({ pointerEvents: "auto", cursor: "pointer" });
-							 // Keep Text Editable only
-							 replyText.attr("contentEditable", true).focus();
-							 throw new Error(reply.err);
-						 }
-
 						 // Update Reply Text with new data
 						 replyText.text(reply.body);
 
@@ -173,7 +165,22 @@ function appendReply(outerCommentsBox, reply) {
 						 // Enable the Edit Button
 						 editReplyButton.css({ pointerEvents: "auto", cursor: "pointer" });
 					 })
-					 .catch(console.log);
+					 .catch(err => {
+						 // Hide the Spinner
+						 editSpinner.hide();
+
+						 // Show Error Icon with error message in tooltip
+						 if (err.responseJSON && err.responseJSON.err)
+							 editErrorIcon.attr("data-tooltip", err.responseJSON.err);
+						 else
+							 editErrorIcon.attr("data-tooltip", "Oops, something went wrong!");
+						 editErrorIcon.show();
+
+						 // Enable the Edit Button
+						 editReplyButton.css({ pointerEvents: "auto", cursor: "pointer" });
+						 // Keep Text Editable only
+						 replyText.attr("contentEditable", true).focus();
+					 });
 				}
 			}
 		}
