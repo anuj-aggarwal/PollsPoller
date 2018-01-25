@@ -376,6 +376,10 @@ function appendReplyForm(comments, replyId) {
                 <div class="ui blue labeled submit icon button outer-reply-button">
                     <i class="icon edit"></i> Add Reply
                 </div>
+                <i class="form-loader large circle notched loading icon" style="display: none;"></i>
+                <span class="form-error-icon" data-inverted="" data-tooltip="Error Replying to Discussion!" data-position="right center" style="display: none;">
+                    <i class="large warning sign icon"></i>
+                </span>
             </form>
         `);
 	}
@@ -400,9 +404,15 @@ function appendReplyForm(comments, replyId) {
 	let form = comments.children(".form");
 	let formButton = form.children(".submit.button");
 	let formTextArea = form.children(".field").children("textarea");
+	const formLoader = form.find(".form-loader");
+	const formErrorIcon = form.find(".form-error-icon");
+
 
 	// Form Reply Button
 	formButton.click(() => {
+		formErrorIcon.hide();
+		formLoader.show();
+
 		// Get the reply text
 		let replyText = formTextArea.val().trim();
 		if (replyText !== "") {
@@ -411,16 +421,24 @@ function appendReplyForm(comments, replyId) {
 				body: replyText
 			})
 			 .then(reply => {
-				 if (reply.err)
-					 throw new Error(reply.err);
-
 				 // Append the new reply
 				 appendReply(comments.children(".replies"), reply);
 				 // Increment parent's replies Count
 				 updateParentRepliesCount(comments.parent().children(".content").find(".replies-count"), 1);
+
+				 formLoader.hide();
+				 formTextArea.val("");
 			 })
-			 .catch(console.log);
-			formTextArea.val("");
+			 .catch(err => {
+			 	console.error(err);
+			 	formLoader.hide();
+			 	if(err.responseJSON && err.responseJSON.err)
+			 		formErrorIcon.attr("data-tooltip", err.responseJSON.err);
+			 	else
+			 		formErrorIcon.attr("data-tooltip", "Error Replying to Discussion!");
+			 	formErrorIcon.show();
+			 });
+
 		}
 	});
 }
