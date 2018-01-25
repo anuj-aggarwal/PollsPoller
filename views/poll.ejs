@@ -74,6 +74,10 @@
     <!-- Delete Button if User is same as Author -->
     <% if(user && user._id.toString() === poll.author._id.toString()){ %>
         <button id="delete-poll" class="ui tiny red button">Delete</button>
+        <i id="delete-loader" class="large circle notched loading icon" style="display: none;"></i>
+        <span id="delete-error-icon" data-inverted="" data-tooltip="Error Deleting Poll!" data-position="right center" style="display: none;">
+            <i class="large warning sign icon"></i>
+        </span>
     <% } %>
 
 </div>
