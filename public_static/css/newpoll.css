@@ -23,3 +23,7 @@
 .item:last-child .down-btn {
     display: none;
 }
+
+.warning.sign.icon {
+    color: red;
+}
