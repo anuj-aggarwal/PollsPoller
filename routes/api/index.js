@@ -43,7 +43,7 @@ route.use((err, req, res, next) => {
 
 		// Handling other Errors(5xx): Render 500 Errors Page
 		res.status(err.status).send({
-			err: err.message
+			err: "Oops, Something Went Wrong"
 		});
 	}
 });

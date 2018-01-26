@@ -134,7 +134,7 @@ app.use("/", (req, res) => {
 	res.status(httpStatusCodes.NOT_FOUND).render("error-pages/400", {
 		status: httpStatusCodes.NOT_FOUND,
 		heading: httpStatusCodes.getStatusText(httpStatusCodes.NOT_FOUND),
-		description: ""
+		description: "Page not Found!"
 	});
 });
 
@@ -162,15 +162,11 @@ app.use((err, req, res, next) => {
 	// Internal Server Error if no Error Code Stated
 	err.status = err.status || httpStatusCodes.INTERNAL_SERVER_ERROR;
 
-	// Handle ReferenceErrors(caused if error in rendering ejs file: Hide the unnecessary details)
-	if (err instanceof ReferenceError)
-		err.message = "";
-
 	// Handling other Errors(5xx): Render 500 Errors Page
 	res.status(err.status).render("error-pages/500", {
 		status: err.status,
 		heading: httpStatusCodes.getStatusText(err.status),
-		description: err.message
+		description: "Please try again after some time!"
 	});
 });
 
