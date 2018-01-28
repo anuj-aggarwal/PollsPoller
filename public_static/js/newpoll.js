@@ -6,6 +6,8 @@ $(() => {
 	const createPollBtn = $("#create-poll-btn");
 	const optionInput = $("#new-option");
 	const options = $(".option");
+	const loadingIcon = $("#loading-icon");
+	const errorIcon = $("#error-icon");
 
 	//--------------------
 	//   EVENT LISTENERS
@@ -48,6 +50,10 @@ $(() => {
 
 	// Send POST Request on Clicking Create Button
 	createPollBtn.click(() => {
+		// Hide Error Icon if Present and show loading icon
+		errorIcon.hide();
+		loadingIcon.show();
+
 		// Send request to create new Poll
 		$.post("/api/polls", {
 			question: $("#question").val(),
@@ -64,8 +70,14 @@ $(() => {
 		 .catch(err => {
 			 // Else log the Error and Reload the Page
 			 // Reload to update the page with new Flash Message(if present)
-			 console.log("Error creating event!!");
-			 location.reload();
+			 console.error("Error creating event!!");
+			 console.error(err);
+			 loadingIcon.hide();
+			 if (err.responseJSON && err.responseJSON.err)
+				 errorIcon.attr("data-tooltip", err.responseJSON.err);
+			 else
+				 errorIcon.attr("data-tooltip", "Error creating Poll!");
+			 errorIcon.show();
 		 });
 	});
 });

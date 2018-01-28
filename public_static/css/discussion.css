@@ -48,3 +48,11 @@
 #replies-spinner {
     animation: 1s linear spin infinite;
 }
+
+.warning.sign.icon {
+    color: red;
+}
+
+.delete-error-icon {
+    float: right;
+}

@@ -1,3 +1,4 @@
+const httpStatusCodes = require("http-status-codes");
 // Create a new Express Router
 const route = require("express").Router();
 
@@ -12,7 +13,7 @@ const { checkLoggedIn } = require("../helpers");
 //--------------------
 
 // GET Route for a page of all polls
-route.get("/", (req, res) => {
+route.get("/", (req, res, next) => {
 
 	// Decide method for sorting(trending/recent/default)
 	// from query parameter "sort"
@@ -32,34 +33,45 @@ route.get("/", (req, res) => {
 			break;
 	}
 
-	const page = parseInt(req.query.page) || 1;
-	const perPage = parseInt(req.query.perPage) || 1;
-	let polls;
+	// Find page, perPage and handle non-positive values
+	let page = Math.max(parseInt(req.query.page) || 1, 1);
+	let perPage = Math.max(parseInt(req.query.perPage) || 1, 1);
 
-	// Get all the polls with question, author and voteCount only
-	models.Poll.find({}, "question author voteCount")
-	// Sort the polls according to sorting method
-	      .sort({ [sortBy]: "descending" })
-	      // Skip and limit to get desired range
-	      .skip(perPage * (page - 1))
-	      .limit(perPage)
-	      // Populate the username of the author
-	      .populate("author", "username")
-	      .then(ps => {
-		      polls = ps;
-		      return models.Poll.count();
+	let count;
+	let numPages;
+
+	// Get count of Polls
+	models.Poll.count()
+	      .then(c => {
+		      count = c;
+
+		      numPages = Math.ceil(count / perPage);
+
+		      // If page out of limits, render last page
+		      if (page > numPages)
+			      page = numPages;
+
+		      // Get all the polls with question, author and voteCount only
+		      return models.Poll.find({}, "question author voteCount")
+		      // Sort the polls according to sorting method
+		                   .sort({ [sortBy]: "descending" })
+		                   // Skip and limit to get desired range
+		                   .skip(perPage * (page - 1))
+		                   .limit(perPage)
+		                   // Populate the username of the author
+		                   .populate("author", "username");
 	      })
 	      // Send the Polls to user
-	      .then(count => {
+	      .then(polls => {
 		      res.render("polls", {
 			      polls,
 			      page,
 			      perPage,
-			      pages: Math.ceil(count / perPage),
+			      pages: numPages,
 			      sort: req.query.sort
 		      });
 	      })
-	      .catch(console.log);
+	      .catch(next);
 });
 
 
@@ -70,14 +82,20 @@ route.get("/new", checkLoggedIn, (req, res) => {
 
 
 // GET Route for Single Poll
-route.get("/:id", (req, res) => {
+route.get("/:id", (req, res, next) => {
 	// Find the Poll with specified id in params
 	models.Poll.findById(req.params.id).populate("author")
 	      .then(poll => {
+		      // If poll not found
+		      if (!poll) {
+			      let err = new Error("Poll does not exists!!");
+			      err.status = httpStatusCodes.NOT_FOUND;
+			      return next(err);
+		      }
 
+		      // If user logged in
 		      // Find the Vote of current user
 		      let optionVoted;
-		      // If user logged in
 		      if (req.user) {
 			      // Find user's vote
 			      let vote = poll.votes.filter(vote => {
@@ -91,19 +109,30 @@ route.get("/:id", (req, res) => {
 		      // If found, Render the Poll Page
 		      res.render("poll", { poll, optionVoted });
 	      })
-	      .catch(err => {
-		      // Else redirect User to Index Page
-		      console.log("Error: " + err);
-		      res.redirect("/");
-	      });
+	      .catch(next);
 });
 
 
 // POST Route to Vote
-route.post("/:id/votes", checkLoggedIn, (req, res) => {
+route.post("/:id/votes", checkLoggedIn, (req, res, next) => {
 	// Find the Poll
 	models.Poll.findById(req.params.id)
 	      .then(poll => {
+		      if (!poll) {
+			      let err = new Error("Poll does not exists!");
+			      err.status = httpStatusCodes.NOT_FOUND;
+			      return next(err);
+		      }
+
+		      // If request does not contain a valid option
+		      // Find option to vote in poll's options
+		      let matchedOptions = poll.options.filter(option => (option._id.toString() === req.body.option));
+		      if(matchedOptions.length === 0) {
+		      	let err = new Error("Not a Valid Option!!");
+		      	err.status = httpStatusCodes.UNPROCESSABLE_ENTITY;
+		      	return next(err);
+		      }
+
 		      // Find if User has already Voted on the Poll
 		      let vote = poll.votes.filter(vote => {
 			      // Compare the ids of vote and user Id
@@ -148,15 +177,9 @@ route.post("/:id/votes", checkLoggedIn, (req, res) => {
 			      return poll.save();
 		      }
 	      })
-	      // Redirect user to the polls page
-	      // TODO: Redirect to some other page depending on further use
+	      // Redirect user to the poll's page
 	      .then(poll => res.redirect(`/polls/${req.params.id}`))
-	      .catch(err => {
-		      // Redirect user to the polls page
-		      // TODO: Redirect to some other page depending on further use
-		      console.log(err);
-		      res.redirect(`/polls/${req.params.id}`);
-	      });
+	      .catch(next);
 });
 
 

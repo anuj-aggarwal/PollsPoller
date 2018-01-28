@@ -1,3 +1,4 @@
+const httpStatusCodes = require("http-status-codes");
 // Create a new Express Router
 const route = require("express").Router();
 
@@ -12,11 +13,12 @@ const { checkLoggedIn } = require("../helpers");
 //--------------------
 
 // GET Route for all polls of User
-route.get("/:id/polls", checkLoggedIn, (req, res) => {
+route.get("/:id/polls", checkLoggedIn, (req, res, next) => {
 	// Check if current user is not the same as Requesting User
 	if (req.user._id.toString() !== req.params.id) {
-		console.log("Invalid Access!!");
-		res.redirect("/");
+		let err = new Error("Can't See Other User's Polls");
+		err.status = httpStatusCodes.UNAUTHORIZED;
+		return next(err);
 	}
 
 	// Decide method for sorting(trending/recent/default)
@@ -37,35 +39,45 @@ route.get("/:id/polls", checkLoggedIn, (req, res) => {
 			break;
 	}
 
-	const page = parseInt(req.query.page) || 1;
-	const perPage = parseInt(req.query.perPage) || 1;
+	// Find page, perPage and handle non-positive values
+	let page = Math.max(parseInt(req.query.page) || 1, 1);
+	let perPage = Math.max(parseInt(req.query.perPage) || 1, 1);
+	let count;
+	let numPages;
 
-	let polls;
+	// Get count of Polls
+	models.Poll.count({ author: req.params.id })
+	      .then(c => {
+		      count = c;
 
-	// Get all the polls with question, createdAt and voteCount only
-	models.Poll.find({
-		author: req.params.id
-	}, "question createdAt voteCount")
-	// Sort the polls according to sorting method
-	      .sort({ [sortBy]: "descending" })
-	      // Skip and limit to get the desired Range
-	      .skip(perPage * (page - 1))
-	      .limit(perPage)
-	      .then(_polls => {
-		      polls = _polls;
-		      return models.Poll.count({ author: req.params.id });
+		      numPages = Math.ceil(count / perPage);
+
+		      // If page out of limits, render last page
+		      if (page > numPages)
+			      page = numPages;
+
+		      // Get all the polls with question, createdAt and voteCount only
+		      return models.Poll.find({
+			      author: req.params.id
+		      }, "question createdAt voteCount")
+		      // Sort the polls according to sorting method
+		                   .sort({ [sortBy]: "descending" })
+		                   // Skip and limit to get
+		                   // the desired Range
+		                   .skip(perPage * (page - 1))
+		                   .limit(perPage);
 	      })
 	      // Render the User Polls page
-	      .then(count => {
+	      .then(polls => {
 		      res.render("userpolls", {
 			      polls,
 			      page,
 			      perPage,
-			      pages: Math.ceil(count / perPage),
+			      pages: numPages,
 			      sort: req.query.sort
 		      });
 	      })
-	      .catch(console.log);
+	      .catch(next);
 });
 
 

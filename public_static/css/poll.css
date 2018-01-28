@@ -19,3 +19,7 @@
 .highlighted {
     background-color: #21ba45a8;
 }
+
+.warning.sign.icon {
+    color: red;
+}

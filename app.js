@@ -6,6 +6,7 @@ const path = require("path");
 const bp = require("body-parser");
 const cp = require("cookie-parser");
 const session = require("express-session");
+const httpStatusCodes = require("http-status-codes");
 
 
 //--------------------
@@ -85,6 +86,12 @@ app.get("/logout", (req, res) => {
 
 // Signup POST Request
 app.post("/signup", (req, res, next) => {
+	if (!req.body.username || !req.body.password || !req.body.name || !req.body.email) {
+		let err = new Error("Incomplete Details!");
+		err.status = httpStatusCodes.BAD_REQUEST;
+		return next(err);
+	}
+
 	// Find the User if already exists
 	models.User.findOne({
 		username: req.body.username
@@ -99,8 +106,11 @@ app.post("/signup", (req, res, next) => {
 				      email: req.body.email
 			      });
 		      // Otherwise throw error if user exists
-		      else
-			      throw Error("User already Exists");
+		      else {
+			      let err = new Error("User already exists!");
+			      err.status = httpStatusCodes.CONFLICT;
+			      return next(err);
+		      }
 	      })
 	      .then(user => {
 		      // Redirect to Login/SignUp Page
@@ -114,11 +124,50 @@ app.post("/signup", (req, res, next) => {
 		      })(req, res, next);
 
 	      })
-	      .catch(err => {
-		      // Redirect to Home Page
-		      console.log(err);
-		      res.redirect("/");
-	      });
+	      .catch(next);
+});
+
+
+// 404 ROUTES
+// Generic Route for all other Routes: Renders 404 Error Page
+app.use("/", (req, res) => {
+	res.status(httpStatusCodes.NOT_FOUND).render("error-pages/400", {
+		status: httpStatusCodes.NOT_FOUND,
+		heading: httpStatusCodes.getStatusText(httpStatusCodes.NOT_FOUND),
+		description: "Page not Found!"
+	});
+});
+
+
+// ----------------------
+// Error handling Routes
+// ----------------------
+
+app.use((err, req, res, next) => {
+	console.error(err.stack);
+
+	// If Response already sent, don't send it again and move forward
+	if (res.headersSent)
+		return;
+
+	// Handling 4xx Errors: Render 400 page
+	if (err.status && Math.floor(err.status / 100) === 4) {
+		return res.status(err.status).render("error-pages/400", {
+			status: err.status,
+			heading: httpStatusCodes.getStatusText(err.status),
+			description: err.message
+		});
+	}
+
+	// Internal Server Error if no Error Code Stated
+	err.status = err.status || httpStatusCodes.INTERNAL_SERVER_ERROR;
+
+	// Handling other Errors(5xx): Render 500 Errors Page
+	res.status(err.status).render("error-pages/500", {
+		status: err.status,
+		heading: httpStatusCodes.getStatusText(err.status),
+		description: "Please try again after some time!"
+	});
 });
 
 

@@ -11,8 +11,16 @@ $(() => {
 	const outerReplyTextArea = $(".outer-reply-text");
 	// Outermost Reply Form's Reply Button
 	const outerReplyButton = $(".outer-reply-button");
+	// Outer Form's Loader
+	const outerFormLoader = $("#outer-form-loader");
+	// Outer Form's Error Icon
+	const outerFormError = $("#outer-form-error");
 	// Replies Spinner Container
 	const repliesSpinnerContainer = $("#spinner-container");
+	// Replies Spinner
+	const repliesSpinner = $("#replies-spinner");
+	// Replies Error icon
+	const repliesErrorIcon = $("#replies-error-icon");
 
 	// Clear Previous Replies if present
 	outerCommentsBox.html("");
@@ -32,7 +40,6 @@ $(() => {
 		}
 	});
 
-
 	/********************
 	 *  Event Listeners  *
 	 *********************/
@@ -43,10 +50,14 @@ $(() => {
 		let replyText = outerReplyTextArea.val().trim();
 		if (replyText !== "") {
 			// make reply, and append it
-			reply(pollId, outerCommentsBox, replyText);
+			reply(pollId, outerCommentsBox, replyText, outerFormLoader, outerFormError);
 			// Clear the Text Area's Value
 			outerReplyTextArea.val("");
 		}
+	});
+
+	repliesErrorIcon.click(() => {
+		updateReplies(pollId, outerCommentsBox, repliesSpinnerContainer);
 	});
 });
 
@@ -67,9 +78,12 @@ function appendReply(outerCommentsBox, reply) {
                             <a class="delete-reply" style="display: none;">
                                 <i class="delete-icon large trash icon"></i>
                             </a>                  
-                        ` : ""
-		}
+                        ` : "" }
                     <i class="delete-spinner large red spinner icon" style="display:none"></i>
+                    <span class="delete-error-icon" data-inverted="" data-tooltip="Oops, Something went Wrong!" data-position="left center" style="display:none;">
+                        <i class="large warning sign icon"></i>
+                    </span>
+                    
                     <!-- Text -->
                     <div class="text">
                         ${reply.body}
@@ -82,9 +96,9 @@ function appendReply(outerCommentsBox, reply) {
                                     <span class="edit-display">Edit</span>
                                     <!-- Spinner: Initially hidden -->
                                     <i class="edit-spinner spinner icon" style="display:none"></i>
+                                    <span class="edit-error-icon" data-inverted="" data-tooltip="Oops, Something went Wrong!" data-position="right center" style="display:none;"><i class="warning sign icon"></i></span>
                                 </a>                    
-                            ` : ""
-		}
+                            ` : "" }
                     </div>
                 </div>
                 
@@ -109,12 +123,16 @@ function appendReply(outerCommentsBox, reply) {
 	let editDisplay = editReplyButton.find(".edit-display");
 	// Edit Button Spinner
 	let editSpinner = editReplyButton.find(".edit-spinner");
+	// Edit Error Icon
+	let editErrorIcon = editReplyButton.find(".edit-error-icon");
 	// Delete Button of current Reply
 	let deleteReplyButton = comment.children(".content").children(".delete-reply");
 	// Trash Icon for Delete
 	let deleteIcon = deleteReplyButton.find(".delete-icon");
 	// Delete Spinner
 	let deleteSpinner = comment.children(".content").children(".delete-spinner");
+	// Delete Error Icon
+	let deleteErrorIcon = comment.children(".content").children(".delete-error-icon");
 
 
 	// Display Delete Button on Hovering the Reply
@@ -131,6 +149,7 @@ function appendReply(outerCommentsBox, reply) {
 
 		// If the button is Done Button
 		if (editReplyButton.data("done")) {
+			editErrorIcon.hide();
 
 			// Get the new reply text
 			let newReplyText = replyText.text().trim();
@@ -152,16 +171,6 @@ function appendReply(outerCommentsBox, reply) {
 						data: { body: newReplyText }
 					})
 					 .then(reply => {
-						 if (reply.err) {
-							 // Hide the Spinner
-							 editSpinner.hide();
-							 // Enable the Edit Button
-							 editReplyButton.css({ pointerEvents: "auto", cursor: "pointer" });
-							 // Keep Text Editable only
-							 replyText.attr("contentEditable", true).focus();
-							 throw new Error(reply.err);
-						 }
-
 						 // Update Reply Text with new data
 						 replyText.text(reply.body);
 
@@ -173,7 +182,24 @@ function appendReply(outerCommentsBox, reply) {
 						 // Enable the Edit Button
 						 editReplyButton.css({ pointerEvents: "auto", cursor: "pointer" });
 					 })
-					 .catch(console.log);
+					 .catch(err => {
+						 console.error(err);
+
+						 // Hide the Spinner
+						 editSpinner.hide();
+
+						 // Show Error Icon with error message in tooltip
+						 if (err.responseJSON && err.responseJSON.err)
+							 editErrorIcon.attr("data-tooltip", err.responseJSON.err);
+						 else
+							 editErrorIcon.attr("data-tooltip", "Oops, something went wrong!");
+						 editErrorIcon.show();
+
+						 // Enable the Edit Button
+						 editReplyButton.css({ pointerEvents: "auto", cursor: "pointer" });
+						 // Keep Text Editable only
+						 replyText.attr("contentEditable", true).focus();
+					 });
 				}
 			}
 		}
@@ -216,12 +242,6 @@ function appendReply(outerCommentsBox, reply) {
 				data: requestBody
 			})
 			 .then(reply => {
-				 if (reply.err) {
-					 deleteSpinner.hide();
-					 deleteIcon.show();
-					 throw new Error(reply.err);
-				 }
-
 				 console.log("Deleted: ");
 				 console.log(reply);
 				 // Update replies count of parent reply(if exists)
@@ -229,9 +249,28 @@ function appendReply(outerCommentsBox, reply) {
 				 // Remove the reply
 				 comment.remove();
 			 })
-			 .catch(console.log);
+			 .catch(err => {
+				 console.error(err);
+
+				 // Hide the spinner
+				 deleteSpinner.hide();
+
+				 // Show Error Icon with message in tooltip
+				 if (err.responseJSON && err.responseJSON.err)
+					 deleteErrorIcon.attr("data-tooltip", err.responseJSON.err);
+				 else
+					 deleteErrorIcon.attr("data-tooltip", "Oops, something went wrong!");
+				 deleteErrorIcon.show();
+			 });
 		}
 	});
+
+	// Show Delete Icon on clicking Delete Error Icon
+	deleteErrorIcon.click(() => {
+		deleteErrorIcon.hide();
+		deleteIcon.show();
+	});
+
 
 	// Get the Replies of current Reply
 	$.get(`/api/replies/${reply._id}/replies`)
@@ -254,7 +293,14 @@ function showReplies(outerCommentsBox, replies) {
 // and updates the CommentsBox
 // uses showReplies()Container, innerReply);
 function updateReplies(pollId, outerCommentsBox, repliesSpinnerContainer) {
+	// Replies Spinner
+	const repliesSpinner = repliesSpinnerContainer.find("#replies-spinner");
+	// Replies Error Icon
+	const repliesErrorIcon = repliesSpinnerContainer.find("#replies-error-icon");
+
 	// Show the Replies spinner
+	repliesErrorIcon.hide();
+	repliesSpinner.show();
 	repliesSpinnerContainer.show();
 
 	// Create a delay for spinner to show
@@ -262,9 +308,6 @@ function updateReplies(pollId, outerCommentsBox, repliesSpinnerContainer) {
 		// Make AJAX Request to Server
 		$.get(`/api/discussions/${pollId}/replies?skip=${repliesLoaded}&limit=${replyCount}`)
 		 .then(replies => {
-			 // If Error not undefined, throw the Error to be catched in catch statement
-			 if (replies.err)
-				 throw new Error(replies.err);
 
 			 repliesLoaded += replies.length;
 			 if (replies.length === 0)
@@ -280,27 +323,42 @@ function updateReplies(pollId, outerCommentsBox, repliesSpinnerContainer) {
 				 updateReplies(pollId, outerCommentsBox, repliesSpinnerContainer);
 		 })
 		 // Log the Error if present
-		 .catch(err => console.log("Error Extracting Replies"));
+		 .catch(err => {
+			 console.error("Error Extracting Replies!");
+			 console.error(err);
+			 repliesSpinner.hide();
+			 repliesErrorIcon.show();
+		 });
 	}, 500);
 }
 
 // function to Make a POST AJAX request to Server to make a reply
 // and append the new reply returned to the comments Box
-function reply(pollId, outerCommentsBox, replyText) {
+function reply(pollId, outerCommentsBox, replyText, outerFormLoader, outerFormError) {
+	outerFormError.hide();
+	outerFormLoader.show();
+
 	// Make an AJAX Request with TextArea's Value
 	$.post(`/api/discussions/${pollId}/replies`, {
 		body: replyText
 	})
 	 .then(reply => {
-		 // If error present, throw it to be catched by outer catch statement
-		 if (reply.err)
-			 throw new Error(reply.err);
+		 outerFormLoader.hide();
 
 		 // Append the new Reply to Comments Box
 		 appendReply(outerCommentsBox, reply);
 	 })
 	 // Log the Error if present
-	 .catch(console.log);
+	 .catch(err => {
+		 console.error(err);
+		 outerFormLoader.hide();
+
+		 if (err.responseJSON && err.responseJSON.err)
+			 outerFormError.attr("data-tooltip", err.responseJSON.err);
+		 else
+			 outerFormError.attr("data-tooltip", "Error Replying to Discussion!");
+		 outerFormError.show();
+	 });
 }
 
 
@@ -318,6 +376,10 @@ function appendReplyForm(comments, replyId) {
                 <div class="ui blue labeled submit icon button outer-reply-button">
                     <i class="icon edit"></i> Add Reply
                 </div>
+                <i class="form-loader large circle notched loading icon" style="display: none;"></i>
+                <span class="form-error-icon" data-inverted="" data-tooltip="Error Replying to Discussion!" data-position="right center" style="display: none;">
+                    <i class="large warning sign icon"></i>
+                </span>
             </form>
         `);
 	}
@@ -342,9 +404,15 @@ function appendReplyForm(comments, replyId) {
 	let form = comments.children(".form");
 	let formButton = form.children(".submit.button");
 	let formTextArea = form.children(".field").children("textarea");
+	const formLoader = form.find(".form-loader");
+	const formErrorIcon = form.find(".form-error-icon");
+
 
 	// Form Reply Button
 	formButton.click(() => {
+		formErrorIcon.hide();
+		formLoader.show();
+
 		// Get the reply text
 		let replyText = formTextArea.val().trim();
 		if (replyText !== "") {
@@ -353,16 +421,24 @@ function appendReplyForm(comments, replyId) {
 				body: replyText
 			})
 			 .then(reply => {
-				 if (reply.err)
-					 throw new Error(reply.err);
-
 				 // Append the new reply
 				 appendReply(comments.children(".replies"), reply);
 				 // Increment parent's replies Count
 				 updateParentRepliesCount(comments.parent().children(".content").find(".replies-count"), 1);
+
+				 formLoader.hide();
+				 formTextArea.val("");
 			 })
-			 .catch(console.log);
-			formTextArea.val("");
+			 .catch(err => {
+			 	console.error(err);
+			 	formLoader.hide();
+			 	if(err.responseJSON && err.responseJSON.err)
+			 		formErrorIcon.attr("data-tooltip", err.responseJSON.err);
+			 	else
+			 		formErrorIcon.attr("data-tooltip", "Error Replying to Discussion!");
+			 	formErrorIcon.show();
+			 });
+
 		}
 	});
 }

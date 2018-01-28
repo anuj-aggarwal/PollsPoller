@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Polls Poller</title>
+
+    <!-- Inclue Common Files -->
+    <% include ../partials/header.ejs %>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/500.css">
+
+</head>
+<body>
+
+<!-- NAVBAR -->
+<% include ../partials/navbar.ejs %>
+
+<!-- HEADER -->
+<div id="header" class="ui header">
+    <!-- Status Code with Icon -->
+    <h1 id="status"><i class="warning sign icon"></i><%= status %></h1>
+    <!-- Heading -->
+    <h1 id="heading"><%= heading %></h1>
+</div>
+
+<!-- Small Description of Error -->
+<p id="description"><%= description %></p>
+
+</body>
+</html>

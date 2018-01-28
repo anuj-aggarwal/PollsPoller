@@ -30,7 +30,10 @@
         </div>
 
         <!-- Load Replies Spinner -->
-        <div id="spinner-container" style="display:none;"><i id="replies-spinner" class="big spinner icon"></i></div>
+        <div id="spinner-container" style="display:none;">
+            <i id="replies-spinner" class="big spinner icon"></i>
+            <span id="replies-error-icon" data-inverted="" data-tooltip="Error Loading Replies" data-position="bottom center" style="display: none;"><i class="big warning sign icon"></i></span>
+        </div>
 
         <% if(user) { %>
             <!-- Outermost Reply Form -->
@@ -43,6 +46,10 @@
                 <div class="ui blue labeled submit icon button outer-reply-button">
                     <i class="icon edit"></i> Add Reply
                 </div>
+                <i id="outer-form-loader" class="large circle notched loading icon" style="display: none;"></i>
+                <span id="outer-form-error" data-inverted="" data-tooltip="Error Replying to Discussion!" data-position="right center" style="display: none;">
+                    <i class="large warning sign icon"></i>
+                </span>
             </form>
         <% } else { %>
             <!-- Outermost Reply Form -->

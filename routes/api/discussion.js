@@ -1,3 +1,4 @@
+const httpStatusCodes = require("http-status-codes");
 // Create a new Express Router
 const route = require("express").Router();
 
@@ -12,14 +13,26 @@ const { checkAPILoggedIn } = require("../../helpers");
 //--------------------
 
 // POST Route for Replying to Discussion(not to another reply)
-route.post("/:pollId/replies", checkAPILoggedIn, (req, res) => {
+route.post("/:pollId/replies", checkAPILoggedIn, (req, res, next) => {
+	if(!req.body.body) {
+		let err = new Error("Reply text not present!");
+		err.status = httpStatusCodes.BAD_REQUEST;
+		return next(err);
+	}
+
 	// Find the poll to reply on
 	models.Poll.findById(req.params.pollId)
 	      .then(poll => {
+		      if (!poll) {
+			      let err = new Error("Poll does not exists!!");
+			      err.status = httpStatusCodes.NOT_FOUND;
+			      return next(err);
+		      }
+
 		      // Create new Reply
 		      let reply = models.Reply.create({
 			      sender: req.user._id,
-			      body: req.body.body
+			      body: req.body.body.toString()
 		      })
 		                        .then(reply => {
 			                        // Add the new reply to poll's Replies
@@ -32,16 +45,25 @@ route.post("/:pollId/replies", checkAPILoggedIn, (req, res) => {
 			                            .then(reply => res.send(reply));
 		                        });
 	      })
-	      .catch(err => {
-		      // Else redirect User to Index Page
-		      console.log("Error: " + err);
-		      res.send({ err: "Unable to Reply" });
-	      });
+	      .catch(next);
 });
 
 
 // Get Route for All Replies of a Discussion
-route.get("/:pollId/replies", (req, res) => {
+route.get("/:pollId/replies", (req, res, next) => {
+	let skip = parseInt(req.query.skip);
+	if(isNaN(skip) || skip < 0) {
+		let err = new Error("Invalid skip value");
+		err.status = httpStatusCodes.BAD_REQUEST;
+		return next(err);
+	}
+	let limit = parseInt(req.query.limit);
+	if(isNaN(limit) || limit < 0) {
+		let err = new Error("Invalid limit value");
+		err.status = httpStatusCodes.BAD_REQUEST;
+		return next(err);
+	}
+
 	// Find the Poll
 	// Populate the Replies and sender of each Reply
 	models.Poll.findById(req.params.pollId)
@@ -52,12 +74,16 @@ route.get("/:pollId/replies", (req, res) => {
 		      }
 	      })
 	      // Send the replies to the user
-	      .then(poll => res.send(poll.replies.slice(parseInt(req.query.skip), parseInt(req.query.skip) + parseInt(req.query.limit))))
-	      .catch(err => {
-		      // Log the Error and Redirect to Home Page
-		      console.log(err);
-		      res.redirect({ err: "Unable to Retrieve Replies" });
-	      });
+	      .then(poll => {
+		      if (!poll) {
+			      let err = new Error("Poll does not exists!!");
+			      err.status = httpStatusCodes.NOT_FOUND;
+			      return next(err);
+		      }
+
+		      res.send(poll.replies.slice(skip, skip + limit));
+	      })
+	      .catch(next);
 });
 
 
