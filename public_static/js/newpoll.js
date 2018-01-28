@@ -19,6 +19,14 @@ $(() => {
 			addOptionBtn.click();
 	});
 
+	// Delete Option Event Handler
+	addDeleteEvents(optionList);
+	// Edit Option Event Handler
+	addEditEvents(optionList);
+	// Arrow Buttons Event Handlers
+	addUpDownArrowEvents(optionList);
+
+
 	// Add Option on pressing Add Button
 	addOptionBtn.click(() => {
 		if (optionInput.val().trim() !== "") {
@@ -41,11 +49,6 @@ $(() => {
 
 		// Initialize input value to ''
 		optionInput.val("");
-
-		// Add Event Listeners
-		addDeleteEvents();
-		addEditEvents();
-		addUpDownArrowEvents();
 	});
 
 	// Send POST Request on Clicking Create Button
@@ -82,37 +85,30 @@ $(() => {
 	});
 });
 
-// Function to add Event Listeners to Delete Button of Options
-function addDeleteEvents() {
-	let deleteOptionBtn = $(".delete-option");
-
-	//Remove old event handlers
-	deleteOptionBtn.off("click");
-
-	//Delete the option on click event
-	deleteOptionBtn.click(event => {
-		let option = $(event.target).closest(".item");
+// Function to add Event Listeners to Delete Buttons of Options
+function addDeleteEvents(optionList) {
+	// If clicked Delete Button on any Option
+	optionList.on("click", ".delete-option", event => {
+		let option = $(event.currentTarget).closest(".item");
 		option.remove();
 	});
 }
 
 // Function to add Event Listeners to Edit Button of Options
-function addEditEvents() {
-	let editOptionBtn = $(".edit-option");
+function addEditEvents(optionList) {
+	// If clicked edit button on any option
+	optionList.on("click", ".edit-option", function(event) {
+		let editOptionBtn = $(event.currentTarget);
+		let OptionField = editOptionBtn.closest(".ui.grid").find(".option .option-text");
 
-	//Remove old event handlers
-	editOptionBtn.off("click");
-
-	editOptionBtn.click(event => {
-		let OptionField = $(event.target).closest(".ui.grid").find(".option .option-text");
 		//if edit button was clicked
 		if (editOptionBtn.data("done") === "edit") {
 			// Make Option Text editable and focused
-			$(OptionField).attr("contenteditable", true).focus();
+			OptionField.attr("contenteditable", true).focus();
 
 			//Change edit button to check mark
-			$(event.target).removeClass("write");
-			$(event.target).addClass("checkmark");
+			editOptionBtn.removeClass("write");
+			editOptionBtn.addClass("checkmark");
 
 			//Update data-btn attribute
 			editOptionBtn.data("done", "check");
@@ -120,14 +116,14 @@ function addEditEvents() {
 		//if check button was clicked
 		else {
 			//Get updated option value
-			let newOption = $(OptionField).text().trim();
-			$(OptionField).html(newOption);
+			let newOption = OptionField.text().trim();
+			OptionField.text(newOption);
 
-			$(OptionField).attr("contenteditable", false);
+			OptionField.attr("contenteditable", false);
 
 			//Change checkmark to edit button
-			$(event.target).removeClass("checkmark");
-			$(event.target).addClass("write");
+			editOptionBtn.removeClass("checkmark");
+			editOptionBtn.addClass("write");
 
 			//Update data-btn attribute
 			editOptionBtn.data("done", "edit");
@@ -135,25 +131,18 @@ function addEditEvents() {
 	});
 }
 
-// Function to add event listeners to Move option Up-Down
-function addUpDownArrowEvents() {
-	let upArrowBtn = $(".up-btn");
-	let downArrowBtn = $(".down-btn");
-
-	//Remove old event handlers
-	upArrowBtn.off("click");
-	downArrowBtn.off("click");
-
-
-	upArrowBtn.click(event => {
+// Function to add event listeners to Move options Up-Down
+function addUpDownArrowEvents(optionList) {
+	optionList.on("click", ".up-btn", event => {
 		//Get current option
-		let currentOpt = $(event.target).closest(".item");
+		let currentOpt = $(event.currentTarget).closest(".item");
 		//Get previous sibling
 		currentOpt.prev().before(currentOpt);
 	});
-	downArrowBtn.click(event => {
+
+	optionList.on("click", ".down-btn", event=>{
 		//Get current option
-		let currentOpt = $(event.target).closest(".item");
+		let currentOpt = $(event.currentTarget).closest(".item");
 		//Get next sibling
 		currentOpt.next().after(currentOpt);
 	});
