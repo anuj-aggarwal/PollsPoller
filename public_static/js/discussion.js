@@ -59,6 +59,10 @@ $(() => {
 	repliesErrorIcon.click(() => {
 		updateReplies(pollId, outerCommentsBox, repliesSpinnerContainer);
 	});
+
+
+	// Edit Reply Buttons
+	addEditReplyEvents(outerCommentsBox);
 });
 
 
@@ -142,76 +146,6 @@ function appendReply(outerCommentsBox, reply) {
 	// Toggle comments on clicking replies button
 	repliesBtn.click(() => comments.toggle(200, "linear"));
 
-	// Edit Reply Text on clicking Reply Button
-	editReplyButton.click(() => {
-		// Reply Text
-		let replyText = comment.children(".content").find(".text");
-
-		// If the button is Done Button
-		if (editReplyButton.data("done")) {
-			editErrorIcon.hide();
-
-			// Get the new reply text
-			let newReplyText = replyText.text().trim();
-			if (newReplyText !== "") {
-				// Confirm the Edit operation
-				if (confirm("Confirm Edit?")) {
-
-					// Make Reply text not Editable
-					replyText.attr("contentEditable", false);
-					// Display the spinner
-					editSpinner.show();
-					// Disable the Edit Button
-					editReplyButton.css({ pointerEvents: "none", cursor: "default" });
-
-					// Make PATCH Request to Server to update text
-					$.ajax({
-						url: `/api/replies/${reply._id}`,
-						type: "PATCH",
-						data: { body: newReplyText }
-					})
-					 .then(reply => {
-						 // Update Reply Text with new data
-						 replyText.text(reply.body);
-
-						 // Update Edit Button to Edit(from Done)
-						 editReplyButton.data("done", false);
-						 editDisplay.text("Edit");
-						 // Hide the Spinner
-						 editSpinner.hide();
-						 // Enable the Edit Button
-						 editReplyButton.css({ pointerEvents: "auto", cursor: "pointer" });
-					 })
-					 .catch(err => {
-						 console.error(err);
-
-						 // Hide the Spinner
-						 editSpinner.hide();
-
-						 // Show Error Icon with error message in tooltip
-						 if (err.responseJSON && err.responseJSON.err)
-							 editErrorIcon.attr("data-tooltip", err.responseJSON.err);
-						 else
-							 editErrorIcon.attr("data-tooltip", "Oops, something went wrong!");
-						 editErrorIcon.show();
-
-						 // Enable the Edit Button
-						 editReplyButton.css({ pointerEvents: "auto", cursor: "pointer" });
-						 // Keep Text Editable only
-						 replyText.attr("contentEditable", true).focus();
-					 });
-				}
-			}
-		}
-		// If the button is Edit Button
-		else {
-			// Make Reply Text Editable
-			replyText.attr("contentEditable", true).focus();
-			// Change edit button to a Done Button
-			editReplyButton.data("done", true);
-			editDisplay.text("Done");
-		}
-	});
 
 	// Delete Reply on clicking Delete Button
 	deleteReplyButton.click(() => {
@@ -280,6 +214,92 @@ function appendReply(outerCommentsBox, reply) {
 		 appendReplyForm(comments, reply._id);
 	 })
 	 .catch(console.log);
+}
+
+// Function to add Event Handlers to Edit Reply Buttons
+function addEditReplyEvents(outerCommentsBox) {
+	outerCommentsBox.on("click", ".edit-reply", event => {
+		// Get the comment
+		let comment = $(event.currentTarget).closest(".comment");
+		// Reply Id
+		let replyId = comment.data("reply-id");
+		// Reply Text
+		let replyText = comment.children(".content").find(".text");
+		// editReplyButton
+		let editReplyButton = $(event.currentTarget);
+		// Edit Reply Error Icon
+		let editErrorIcon = editReplyButton.find(".edit-error-icon");
+		// Edit Reply Spinner
+		let editSpinner = editReplyButton.find(".edit-spinner");
+		// Edit Display
+		let editDisplay = editReplyButton.find(".edit-display");
+
+		// If the button is Done Button
+		if (editReplyButton.data("done")) {
+			editErrorIcon.hide();
+
+			// Get the new reply text
+			let newReplyText = replyText.text().trim();
+			console.log(newReplyText)
+			if (newReplyText !== "") {
+				// Confirm the Edit operation
+				if (confirm("Confirm Edit?")) {
+
+					// Make Reply text not Editable
+					replyText.attr("contentEditable", false);
+					// Display the spinner
+					editSpinner.show();
+					// Disable the Edit Button
+					editReplyButton.css({ pointerEvents: "none", cursor: "default" });
+
+					// Make PATCH Request to Server to update text
+					$.ajax({
+						url: `/api/replies/${replyId}`,
+						type: "PATCH",
+						data: { body: newReplyText }
+					})
+					 .then(reply => {
+						 // Update Reply Text with new data
+						 replyText.text(reply.body);
+
+						 // Update Edit Button to Edit(from Done)
+						 editReplyButton.data("done", false);
+						 editDisplay.text("Edit");
+						 // Hide the Spinner
+						 editSpinner.hide();
+						 // Enable the Edit Button
+						 editReplyButton.css({ pointerEvents: "auto", cursor: "pointer" });
+					 })
+					 .catch(err => {
+						 console.error(err);
+
+						 // Hide the Spinner
+						 editSpinner.hide();
+
+						 // Show Error Icon with error message in tooltip
+						 if (err.responseJSON && err.responseJSON.err)
+							 editErrorIcon.attr("data-tooltip", err.responseJSON.err);
+						 else
+							 editErrorIcon.attr("data-tooltip", "Oops, something went wrong!");
+						 editErrorIcon.show();
+
+						 // Enable the Edit Button
+						 editReplyButton.css({ pointerEvents: "auto", cursor: "pointer" });
+						 // Keep Text Editable only
+						 replyText.attr("contentEditable", true).focus();
+					 });
+				}
+			}
+		}
+		// If the button is Edit Button
+		else {
+			// Make Reply Text Editable
+			replyText.attr("contentEditable", true).focus();
+			// Change edit button to a Done Button
+			editReplyButton.data("done", true);
+			editDisplay.text("Done");
+		}
+	});
 }
 
 // Function to update all replies in comments Box with replies
@@ -430,13 +450,13 @@ function appendReplyForm(comments, replyId) {
 				 formTextArea.val("");
 			 })
 			 .catch(err => {
-			 	console.error(err);
-			 	formLoader.hide();
-			 	if(err.responseJSON && err.responseJSON.err)
-			 		formErrorIcon.attr("data-tooltip", err.responseJSON.err);
-			 	else
-			 		formErrorIcon.attr("data-tooltip", "Error Replying to Discussion!");
-			 	formErrorIcon.show();
+				 console.error(err);
+				 formLoader.hide();
+				 if (err.responseJSON && err.responseJSON.err)
+					 formErrorIcon.attr("data-tooltip", err.responseJSON.err);
+				 else
+					 formErrorIcon.attr("data-tooltip", "Error Replying to Discussion!");
+				 formErrorIcon.show();
 			 });
 
 		}
