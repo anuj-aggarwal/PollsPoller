@@ -65,6 +65,9 @@ $(() => {
 	addEditReplyEvents(outerCommentsBox);
 	// Delete Reply Buttons
 	addDeleteReplyEvents(outerCommentsBox);
+
+	// Form Reply Buttons
+	addFormReplyEvents(outerCommentsBox);
 });
 
 
@@ -364,30 +367,30 @@ function updateReplies(pollId, outerCommentsBox, repliesSpinnerContainer) {
 
 // function to Make a POST AJAX request to Server to make a reply
 // and append the new reply returned to the comments Box
-function reply(pollId, outerCommentsBox, replyText, outerFormLoader, outerFormError) {
-	outerFormError.hide();
-	outerFormLoader.show();
+function reply(pollId, commentsBox, replyText, formLoader, formErrorIcon) {
+	formErrorIcon.hide();
+	formLoader.show();
 
 	// Make an AJAX Request with TextArea's Value
 	$.post(`/api/discussions/${pollId}/replies`, {
 		body: replyText
 	})
 	 .then(reply => {
-		 outerFormLoader.hide();
+		 formLoader.hide();
 
 		 // Append the new Reply to Comments Box
-		 appendReply(outerCommentsBox, reply);
+		 appendReply(commentsBox, reply);
 	 })
 	 // Log the Error if present
 	 .catch(err => {
 		 console.error(err);
-		 outerFormLoader.hide();
+		 formLoader.hide();
 
 		 if (err.responseJSON && err.responseJSON.err)
-			 outerFormError.attr("data-tooltip", err.responseJSON.err);
+			 formErrorIcon.attr("data-tooltip", err.responseJSON.err);
 		 else
-			 outerFormError.attr("data-tooltip", "Error Replying to Discussion!");
-		 outerFormError.show();
+			 formErrorIcon.attr("data-tooltip", "Error Replying to Discussion!");
+		 formErrorIcon.show();
 	 });
 }
 
@@ -428,24 +431,27 @@ function appendReplyForm(comments, replyId) {
             </form>
         `);
 	}
+}
 
 
-	// EVENT LISTENERS
-	let form = comments.children(".form");
-	let formButton = form.children(".submit.button");
-	let formTextArea = form.children(".field").children("textarea");
-	const formLoader = form.find(".form-loader");
-	const formErrorIcon = form.find(".form-error-icon");
-
-
-	// Form Reply Button
-	formButton.click(() => {
-		formErrorIcon.hide();
-		formLoader.show();
+// Function to add Event Listeners to Form Reply Buttons
+function addFormReplyEvents(outerCommentsBox) {
+	// Form Reply Buttons
+	outerCommentsBox.on("click", ".outer-reply-button", event => {
+		let formButton = $(event.currentTarget);
+		let comments = formButton.closest(".comments");
+		let form = formButton.closest(".form");
+		let formTextArea = form.children(".field").children("textarea");
+		const formLoader = form.find(".form-loader");
+		const formErrorIcon = form.find(".form-error-icon");
+		let replyId = form.closest(".comment").data("reply-id");
 
 		// Get the reply text
 		let replyText = formTextArea.val().trim();
 		if (replyText !== "") {
+			formErrorIcon.hide();
+			formLoader.show();
+
 			// Make an AJAX Request with TextArea's Value
 			$.post(`/api/replies/${replyId}/replies`, {
 				body: replyText
@@ -472,6 +478,7 @@ function appendReplyForm(comments, replyId) {
 		}
 	});
 }
+
 
 // Function to update the Replies Count span, to increment the count
 function updateParentRepliesCount(repliesCountSpan, change) {
