@@ -63,6 +63,8 @@ $(() => {
 
 	// Edit Reply Buttons
 	addEditReplyEvents(outerCommentsBox);
+	// Delete Reply Buttons
+	addDeleteReplyEvents(outerCommentsBox);
 });
 
 
@@ -147,58 +149,6 @@ function appendReply(outerCommentsBox, reply) {
 	repliesBtn.click(() => comments.toggle(200, "linear"));
 
 
-	// Delete Reply on clicking Delete Button
-	deleteReplyButton.click(() => {
-		// Confirm Delete
-		if (confirm("Delete Reply?")) {
-
-			// Change Delete Icon to a Spinner
-			deleteIcon.hide();
-			deleteSpinner.show();
-
-			// Get outer Reply
-			let outerReply = comment.parent().closest(".comment");
-
-			let requestBody = {};
-			// If Reply is outermost(No outer reply exists)
-			if (outerReply.length === 0) {
-				requestBody = { pollId: $("#outer-replies").data("poll-id") };
-			}
-			// If Reply is inner reply
-			else {
-				requestBody = { outerReplyId: outerReply.data("reply-id") };
-			}
-
-			// Send Delete Request to Server
-			$.ajax({
-				url: `/api/replies/${reply._id}`,
-				type: "DELETE",
-				data: requestBody
-			})
-			 .then(reply => {
-				 console.log("Deleted: ");
-				 console.log(reply);
-				 // Update replies count of parent reply(if exists)
-				 updateParentRepliesCount(outerReply.children(".content").find(".replies-count"), -1);
-				 // Remove the reply
-				 comment.remove();
-			 })
-			 .catch(err => {
-				 console.error(err);
-
-				 // Hide the spinner
-				 deleteSpinner.hide();
-
-				 // Show Error Icon with message in tooltip
-				 if (err.responseJSON && err.responseJSON.err)
-					 deleteErrorIcon.attr("data-tooltip", err.responseJSON.err);
-				 else
-					 deleteErrorIcon.attr("data-tooltip", "Oops, something went wrong!");
-				 deleteErrorIcon.show();
-			 });
-		}
-	});
-
 	// Show Delete Icon on clicking Delete Error Icon
 	deleteErrorIcon.click(() => {
 		deleteErrorIcon.hide();
@@ -240,7 +190,7 @@ function addEditReplyEvents(outerCommentsBox) {
 
 			// Get the new reply text
 			let newReplyText = replyText.text().trim();
-			console.log(newReplyText)
+			console.log(newReplyText);
 			if (newReplyText !== "") {
 				// Confirm the Edit operation
 				if (confirm("Confirm Edit?")) {
@@ -301,6 +251,76 @@ function addEditReplyEvents(outerCommentsBox) {
 		}
 	});
 }
+
+// Function to add Event Handlers to Delete Reply Buttons
+function addDeleteReplyEvents(outerCommentsBox) {
+	// Delete Reply on clicking Delete Button
+	outerCommentsBox.on("click", ".delete-reply", event => {
+		// Current Delete Reply Button
+		let deleteReplyButton = $(event.currentTarget);
+		// Trash Icon for Delete
+		let deleteIcon = deleteReplyButton.find(".delete-icon");
+		// Delete Spinner
+		let deleteSpinner = deleteReplyButton.siblings(".delete-spinner");
+		// Delete Error Icon
+		let deleteErrorIcon = deleteReplyButton.siblings(".delete-error-icon");
+
+		// Comment
+		let comment = deleteReplyButton.closest(".comment");
+		// Current Reply Id
+		let replyId = comment.data("reply-id");
+
+		// Confirm Delete
+		if (confirm("Delete Reply?")) {
+
+			// Change Delete Icon to a Spinner
+			deleteIcon.hide();
+			deleteSpinner.show();
+
+			// Get outer Reply
+			let outerReply = comment.parent().closest(".comment");
+
+			let requestBody = {};
+			// If Reply is outermost(No outer reply exists)
+			if (outerReply.length === 0) {
+				requestBody = { pollId: $("#outer-replies").data("poll-id") };
+			}
+			// If Reply is inner reply
+			else {
+				requestBody = { outerReplyId: outerReply.data("reply-id") };
+			}
+
+			// Send Delete Request to Server
+			$.ajax({
+				url: `/api/replies/${replyId}`,
+				type: "DELETE",
+				data: requestBody
+			})
+			 .then(reply => {
+				 console.log("Deleted: ");
+				 console.log(reply);
+				 // Update replies count of parent reply(if exists)
+				 updateParentRepliesCount(outerReply.children(".content").find(".replies-count"), -1);
+				 // Remove the reply
+				 comment.remove();
+			 })
+			 .catch(err => {
+				 console.error(err);
+
+				 // Hide the spinner
+				 deleteSpinner.hide();
+
+				 // Show Error Icon with message in tooltip
+				 if (err.responseJSON && err.responseJSON.err)
+					 deleteErrorIcon.attr("data-tooltip", err.responseJSON.err);
+				 else
+					 deleteErrorIcon.attr("data-tooltip", "Oops, something went wrong!");
+				 deleteErrorIcon.show();
+			 });
+		}
+	});
+}
+
 
 // Function to update all replies in comments Box with replies
 // uses appendReply()
