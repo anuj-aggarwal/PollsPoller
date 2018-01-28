@@ -126,7 +126,10 @@ function deleteReplyAndChildren(replyId) {
 	             .then(() => {
 		             return models.Reply.findByIdAndRemove(replyId);
 	             })
-	             .then(reply => console.log("Deleted: " + reply));
+	             .then(reply => {
+		             console.log("Deleted: " + reply);
+		             return reply;
+	             });
 }
 
 // DELETE Request to delete a reply
