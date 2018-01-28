@@ -123,20 +123,10 @@ function appendReply(outerCommentsBox, reply) {
 	let comments = comment.children(".comments");
 	// Replies Button of current Reply
 	let repliesBtn = comment.children(".content").find(".reply");
-	// Edit button of current Reply
-	let editReplyButton = comment.children(".content").find(".edit-reply");
-	// Edit Button Display Text
-	let editDisplay = editReplyButton.find(".edit-display");
-	// Edit Button Spinner
-	let editSpinner = editReplyButton.find(".edit-spinner");
-	// Edit Error Icon
-	let editErrorIcon = editReplyButton.find(".edit-error-icon");
 	// Delete Button of current Reply
 	let deleteReplyButton = comment.children(".content").children(".delete-reply");
 	// Trash Icon for Delete
 	let deleteIcon = deleteReplyButton.find(".delete-icon");
-	// Delete Spinner
-	let deleteSpinner = comment.children(".content").children(".delete-spinner");
 	// Delete Error Icon
 	let deleteErrorIcon = comment.children(".content").children(".delete-error-icon");
 
