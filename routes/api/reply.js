@@ -18,6 +18,9 @@ route.get("/:id/replies", (req, res, next) => {
 		      path: "replies",
 		      populate: {
 			      path: "sender"
+		      },
+		      options: {
+			      sort: "-createdAt"
 		      }
 	      })
 	      // Send the replies to user

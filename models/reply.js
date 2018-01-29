@@ -13,7 +13,10 @@ const replySchema = mongoose.Schema({
 		ref: "reply"
 	}]
 }, {
-	usePushEach: true   // Use Mongo $pushEach instead of deprecated $pushAll
+	usePushEach: true,  // Use Mongo $pushEach instead of deprecated $pushAll
+	timestamps: {
+		createdAt: "createdAt"
+	}
 });
 
 // Export Reply Model
