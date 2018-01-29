@@ -7,6 +7,10 @@
 
     <% include ./partials/header.ejs %>
     <link rel="stylesheet" href="/css/newpoll.css">
+
+    <!-- HandleBars -->
+    <script src="/lib/handlebars.js"></script>
+    <!-- Custom JS -->
     <script src="/js/newpoll.js"></script>
 </head>
 <body>
@@ -56,6 +60,26 @@
     </div>
 
 </section>
+
+
+<!-- TEMPLATES -->
+<!-- Option -->
+<script id="option-template" type="text/x-handlebars-template">
+    <div class="item">
+        <div class="ui grid">
+            <div class="option eleven wide column">
+                <div class="option-text">
+                    {{optionText}}
+                </div>
+            </div>
+            <div class="one wide column"><i class="ui up-btn chevron up icon blue-hover"></i></div>
+            <div class="one wide column"><i class="ui down-btn chevron down icon blue-hover"></i></div>
+            <div class="one wide column"><i class="ui edit-option write icon blue-hover" data-done="edit"></i></div>
+            <div class="two wide column"><i class="delete-option ui remove icon blue-hover"></i></div>
+        </div>
+    </div>
+</script>
+
 
 </body>
 </html>
