@@ -3,6 +3,11 @@ let repliesLoaded = 0;
 let allRepliesLoaded = false;
 
 $(() => {
+	// Templates
+	const replySource = $("#reply-template").html();
+	const replyTemplate = Handlebars.compile(replySource);
+
+
 	// Poll ID of the Discussion
 	const pollId = $("#outer-replies").data("poll-id");
 	// Outermost Comments Box to add initial comments to
@@ -25,7 +30,7 @@ $(() => {
 	// Clear Previous Replies if present
 	outerCommentsBox.html("");
 	// Initialize Comments on Page Load
-	updateReplies(pollId, outerCommentsBox, repliesSpinnerContainer);
+	updateReplies(pollId, outerCommentsBox, repliesSpinnerContainer, replyTemplate);
 	// Avoid Scrolling of window at load
 	$(window).scrollTop(0);
 
@@ -35,7 +40,7 @@ $(() => {
 		if (allRepliesLoaded === false) {
 			// If user scrolled to bottom and has replies to load, update the replies
 			if ($(window).scrollTop() + $(window).height() >= $(document).height()) {
-				updateReplies(pollId, outerCommentsBox, repliesSpinnerContainer);
+				updateReplies(pollId, outerCommentsBox, repliesSpinnerContainer, replyTemplate);
 			}
 		}
 	});
@@ -50,14 +55,14 @@ $(() => {
 		let replyText = outerReplyTextArea.val().trim();
 		if (replyText !== "") {
 			// make reply, and append it
-			reply(pollId, outerCommentsBox, replyText, outerFormLoader, outerFormError);
+			reply(pollId, outerCommentsBox, replyText, outerFormLoader, outerFormError, replyTemplate);
 			// Clear the Text Area's Value
 			outerReplyTextArea.val("");
 		}
 	});
 
 	repliesErrorIcon.click(() => {
-		updateReplies(pollId, outerCommentsBox, repliesSpinnerContainer);
+		updateReplies(pollId, outerCommentsBox, repliesSpinnerContainer, replyTemplate);
 	});
 
 
@@ -67,58 +72,22 @@ $(() => {
 	addDeleteReplyEvents(outerCommentsBox);
 
 	// Form Reply Buttons
-	addFormReplyEvents(outerCommentsBox);
+	addFormReplyEvents(outerCommentsBox, replyTemplate);
 });
 
 
 // Function to Append a single Reply to Outer Comments Box of current reply
-function appendReply(outerCommentsBox, reply) {
-	outerCommentsBox.append(`
-            <div data-reply-id="${reply._id}" class="comment">
-                <!-- Avatar -->
-                <a class="avatar">
-                    <img src="http://via.placeholder.com/50x50">
-                </a>
-                <div class="content">
-                    <!-- Username -->
-                    <a class="author">${reply.sender.username}</a>
-                    ${(reply.sender._id.toString() === $("#username").data("user-id")) ? `
-                            <!-- Delete Button -->
-                            <a class="delete-reply" style="display: none;">
-                                <i class="delete-icon large trash icon"></i>
-                            </a>                  
-                        ` : "" }
-                    <i class="delete-spinner large red spinner icon" style="display:none"></i>
-                    <span class="delete-error-icon" data-inverted="" data-tooltip="Oops, Something went Wrong!" data-position="left center" style="display:none;">
-                        <i class="large warning sign icon"></i>
-                    </span>
-                    
-                    <!-- Text -->
-                    <div class="text">
-                        ${reply.body}
-                    </div>
-                    <!-- Reply Button -->
-                    <div class="actions">
-                        <a class="reply">Replies (<span class="replies-count">${reply.replies.length}</span>)</a>
-                        ${(reply.sender._id.toString() === $("#username").data("user-id")) ? `
-                                <a data-done="false" class="edit-reply">
-                                    <span class="edit-display">Edit</span>
-                                    <!-- Spinner: Initially hidden -->
-                                    <i class="edit-spinner spinner icon" style="display:none"></i>
-                                    <span class="edit-error-icon" data-inverted="" data-tooltip="Oops, Something went Wrong!" data-position="right center" style="display:none;"><i class="warning sign icon"></i></span>
-                                </a>                    
-                            ` : "" }
-                    </div>
-                </div>
-                
-                <!-- Comments: Initially hidden -->
-                <div class="comments" style="display:none">
-                    <div class="replies">
-                        <!-- Comments to be added on page load/ new reply -->
-                    </div>
-                </div>
-            </div>
-        `);
+function appendReply(outerCommentsBox, reply, replyTemplate) {
+	const templateData = {
+		replyId: reply._id,
+		senderUsername: reply.sender.username,
+		authenticated: reply.sender._id.toString() === $("#username").data("user-id"),
+		replyBody: reply.body,
+		repliesLength: reply.replies.length,
+	};
+	const replyHtml = replyTemplate(templateData);
+	outerCommentsBox.append(replyHtml);
+
 
 	// Current reply
 	let comment = $(`[data-reply-id="${reply._id}"]`);
@@ -153,7 +122,7 @@ function appendReply(outerCommentsBox, reply) {
 	$.get(`/api/replies/${reply._id}/replies`)
 	 .then(replies => {
 		 // Append each reply to replies container
-		 replies.forEach(innerReply => appendReply(comments.children(".replies"), innerReply));
+		 replies.forEach(innerReply => appendReply(comments.children(".replies"), innerReply, replyTemplate));
 		 appendReplyForm(comments, reply._id);
 	 })
 	 .catch(console.log);
@@ -317,15 +286,15 @@ function addDeleteReplyEvents(outerCommentsBox) {
 
 // Function to update all replies in comments Box with replies
 // uses appendReply()
-function showReplies(outerCommentsBox, replies) {
+function showReplies(outerCommentsBox, replies, replyTemplate) {
 	// For each Reply in replies, append it to Comments Box
-	replies.forEach(reply => appendReply(outerCommentsBox, reply));
+	replies.forEach(reply => appendReply(outerCommentsBox, reply, replyTemplate));
 }
 
 // Function to Load Replies from Server through AJAX Request
 // and updates the CommentsBox
 // uses showReplies()Container, innerReply);
-function updateReplies(pollId, outerCommentsBox, repliesSpinnerContainer) {
+function updateReplies(pollId, outerCommentsBox, repliesSpinnerContainer, replyTemplate) {
 	// Replies Spinner
 	const repliesSpinner = repliesSpinnerContainer.find("#replies-spinner");
 	// Replies Error Icon
@@ -347,13 +316,13 @@ function updateReplies(pollId, outerCommentsBox, repliesSpinnerContainer) {
 				 allRepliesLoaded = true;
 
 			 // update the DOM if no error
-			 showReplies(outerCommentsBox, replies);
+			 showReplies(outerCommentsBox, replies, replyTemplate);
 
 			 // Hide the Spinner
 			 repliesSpinnerContainer.hide();
 
 			 if ($(window).height() >= $(document).height() && allRepliesLoaded === false)
-				 updateReplies(pollId, outerCommentsBox, repliesSpinnerContainer);
+				 updateReplies(pollId, outerCommentsBox, repliesSpinnerContainer, replyTemplate);
 		 })
 		 // Log the Error if present
 		 .catch(err => {
@@ -367,7 +336,7 @@ function updateReplies(pollId, outerCommentsBox, repliesSpinnerContainer) {
 
 // function to Make a POST AJAX request to Server to make a reply
 // and append the new reply returned to the comments Box
-function reply(pollId, commentsBox, replyText, formLoader, formErrorIcon) {
+function reply(pollId, commentsBox, replyText, formLoader, formErrorIcon, replyTemplate) {
 	formErrorIcon.hide();
 	formLoader.show();
 
@@ -379,7 +348,7 @@ function reply(pollId, commentsBox, replyText, formLoader, formErrorIcon) {
 		 formLoader.hide();
 
 		 // Append the new Reply to Comments Box
-		 appendReply(commentsBox, reply);
+		 appendReply(commentsBox, reply, replyTemplate);
 	 })
 	 // Log the Error if present
 	 .catch(err => {
@@ -435,7 +404,7 @@ function appendReplyForm(comments, replyId) {
 
 
 // Function to add Event Listeners to Form Reply Buttons
-function addFormReplyEvents(outerCommentsBox) {
+function addFormReplyEvents(outerCommentsBox, replyTemplate) {
 	// Form Reply Buttons
 	outerCommentsBox.on("click", ".outer-reply-button", event => {
 		let formButton = $(event.currentTarget);
@@ -458,7 +427,7 @@ function addFormReplyEvents(outerCommentsBox) {
 			})
 			 .then(reply => {
 				 // Append the new reply
-				 appendReply(comments.children(".replies"), reply);
+				 appendReply(comments.children(".replies"), reply, replyTemplate);
 				 // Increment parent's replies Count
 				 updateParentRepliesCount(comments.parent().children(".content").find(".replies-count"), 1);
 
