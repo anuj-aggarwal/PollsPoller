@@ -1,5 +1,9 @@
 // On window Load
 $(() => {
+	// Templates
+	const optionSource = $("#option-template").html();
+	const optionTemplate = Handlebars.compile(optionSource);
+
 	// Get Inputs and Buttons
 	const optionList = $("#options");
 	const addOptionBtn = $("#add-option-btn");
@@ -30,21 +34,10 @@ $(() => {
 	// Add Option on pressing Add Button
 	addOptionBtn.click(() => {
 		if (optionInput.val().trim() !== "") {
-			optionList.append(`
-                <div class="item">
-                    <div class="ui grid">
-                        <div class="option eleven wide column">
-                            <div class="option-text">
-                                ${optionInput.val().trim()}
-                            </div>
-                        </div>
-                        <div class="one wide column"><i class="ui up-btn chevron up icon blue-hover"></i></div>
-                        <div class="one wide column"><i class="ui down-btn chevron down icon blue-hover"></i></div>
-                        <div class="one wide column"><i class="ui edit-option write icon blue-hover" data-done="edit"></i></div>
-                        <div class="two wide column"><i class="delete-option ui remove icon blue-hover"></i></div>
-                    </div>
-                </div>
-            `);
+			const optionHtml = optionTemplate({
+				optionText: optionInput.val().trim()
+			});
+			optionList.append(optionHtml);
 		}
 
 		// Initialize input value to ''
