@@ -79,16 +79,21 @@ $(() => {
 
 
 // Function to Append a single Reply to Outer Comments Box of current reply
-function appendReply(outerCommentsBox, reply, replyTemplate, replyFormTemplate) {
+function appendReply(outerCommentsBox, reply, replyTemplate, replyFormTemplate, toPrepend = false) {
 	const templateData = {
 		replyId: reply._id,
 		senderUsername: reply.sender.username,
 		authenticated: reply.sender._id.toString() === $("#username").data("user-id"),
 		replyBody: reply.body,
-		repliesLength: reply.replies.length,
+		repliesLength: reply.replies.length
 	};
 	const replyHtml = replyTemplate(templateData);
-	outerCommentsBox.append(replyHtml);
+
+	console.log(toPrepend);
+	if (!toPrepend)
+		outerCommentsBox.append(replyHtml);
+	else
+		outerCommentsBox.prepend(replyHtml);
 
 
 	// Current reply
@@ -350,7 +355,7 @@ function reply(pollId, commentsBox, replyText, formLoader, formErrorIcon, replyT
 		 formLoader.hide();
 
 		 // Append the new Reply to Comments Box
-		 appendReply(commentsBox, reply, replyTemplate, replyFormTemplate);
+		 appendReply(commentsBox, reply, replyTemplate, replyFormTemplate, true);
 	 })
 	 // Log the Error if present
 	 .catch(err => {
@@ -368,7 +373,7 @@ function reply(pollId, commentsBox, replyText, formLoader, formErrorIcon, replyT
 
 // Function to append the Reply Form at the end of Comments Container of a Reply
 function appendReplyForm(comments, replyId, replyFormTemplate) {
-	const replyFormHtml = replyFormTemplate({loggedIn: $("#username").data("user-id")});
+	const replyFormHtml = replyFormTemplate({ loggedIn: $("#username").data("user-id") });
 	comments.append(replyFormHtml);
 }
 
@@ -397,7 +402,7 @@ function addFormReplyEvents(outerCommentsBox, replyTemplate, replyFormTemplate) 
 			})
 			 .then(reply => {
 				 // Append the new reply
-				 appendReply(comments.children(".replies"), reply, replyTemplate, replyFormTemplate);
+				 appendReply(comments.children(".replies"), reply, replyTemplate, replyFormTemplate, true);
 				 // Increment parent's replies Count
 				 updateParentRepliesCount(comments.parent().children(".content").find(".replies-count"), 1);
 
