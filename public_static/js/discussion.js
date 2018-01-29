@@ -354,6 +354,9 @@ function reply(pollId, commentsBox, replyText, formLoader, formErrorIcon, replyT
 	 .then(reply => {
 		 formLoader.hide();
 
+		 // Increment replies loaded count
+		 ++repliesLoaded;
+
 		 // Append the new Reply to Comments Box
 		 appendReply(commentsBox, reply, replyTemplate, replyFormTemplate, true);
 	 })
