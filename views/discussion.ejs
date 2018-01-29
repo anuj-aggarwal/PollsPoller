@@ -90,15 +90,16 @@
 
             <!-- Delete Button: If Authenticated -->
             {{#if authenticated}}
-                <a class="delete-reply" style="display: none;">
-                    <i class="delete-icon large trash icon"></i>
-                </a>
+            <a class="delete-reply" style="display: none;">
+                <i class="delete-icon large trash icon"></i>
+            </a>
             {{/if}}
 
             <!-- Delete Spinner -->
             <i class="delete-spinner large red spinner icon" style="display:none"></i>
             <!-- Delete Error Icon -->
-            <span class="delete-error-icon" data-inverted="" data-tooltip="Oops, Something went Wrong!" data-position="left center" style="display:none;">
+            <span class="delete-error-icon" data-inverted="" data-tooltip="Oops, Something went Wrong!"
+                  data-position="left center" style="display:none;">
                 <i class="large warning sign icon"></i>
             </span>
 
@@ -113,14 +114,14 @@
 
                 <!-- Edit Reply Button: If Authenticated -->
                 {{#if authenticated}}
-                    <a data-done="false" class="edit-reply">
-                        <span class="edit-display">Edit</span>
-                        <!-- Spinner: Initially hidden -->
-                        <i class="edit-spinner spinner icon" style="display:none"></i>
-                        <!-- Edit Error Icon -->
-                        <span class="edit-error-icon" data-inverted="" data-tooltip="Oops, Something went Wrong!"
-                              data-position="right center" style="display:none;"><i class="warning sign icon"></i></span>
-                    </a>
+                <a data-done="false" class="edit-reply">
+                    <span class="edit-display">Edit</span>
+                    <!-- Spinner: Initially hidden -->
+                    <i class="edit-spinner spinner icon" style="display:none"></i>
+                    <!-- Edit Error Icon -->
+                    <span class="edit-error-icon" data-inverted="" data-tooltip="Oops, Something went Wrong!"
+                          data-position="right center" style="display:none;"><i class="warning sign icon"></i></span>
+                </a>
                 {{/if}}
             </div>
         </div>
@@ -128,10 +129,44 @@
         <!-- Comments: Initially hidden -->
         <div class="comments" style="display:none">
             <div class="replies">
-            <!-- Comments to be added on page load/ new reply -->
+                <!-- Comments to be added on page load/ new reply -->
             </div>
         </div>
     </div>
+</script>
+
+<!-- Reply Form Template -->
+<script id="reply-form-template" type="text/x-handlebars-template">
+    {{#if loggedIn}}
+        <!-- Outermost Reply Form -->
+        <form class="ui form reply-form">
+            <!-- TextArea -->
+            <div class="field">
+                <textarea class="outer-reply-text" rows="2"></textarea>
+            </div>
+            <!-- Reply Button -->
+            <div class="ui blue labeled submit icon button outer-reply-button">
+                <i class="icon edit"></i> Add Reply
+            </div>
+            <i class="form-loader large circle notched loading icon" style="display: none;"></i>
+            <span class="form-error-icon" data-inverted="" data-tooltip="Error Replying to Discussion!"
+                  data-position="right center" style="display: none;">
+                <i class="large warning sign icon"></i>
+            </span>
+        </form>
+    {{else}}
+        <!-- Outermost Reply Form -->
+        <form class="ui form reply-form">
+            <!-- No Reply Text -->
+
+            <!-- Reply Button -->
+            <span data-inverted="" data-tooltip="Login to Reply!" data-position="right center">
+                <button class="ui disabled labeled submit icon button outer-reply-button">
+                    <i class="icon edit"></i> Add Reply
+                </button>
+            </span>
+        </form>
+    {{/if}}
 </script>
 
 
