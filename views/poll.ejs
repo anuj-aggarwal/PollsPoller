@@ -6,6 +6,10 @@
 
     <% include ./partials/header.ejs %>
     <link rel="stylesheet" href="/css/poll.css">
+
+    <!-- SOCKET IO Script -->
+    <script src="/socket.io/socket.io.js"></script>
+    <!-- Custom Script -->
     <script src="/js/poll.js"></script>
 
 </head>
@@ -55,14 +59,14 @@
             <!-- Vote Button: Enabled -->
             <button class="ui blue label">
                 Vote
-                <div class="detail"><%= poll.voteCount %></div>
+                <div id="vote-count" class="detail"><%= poll.voteCount %></div>
             </button>
         <% } else { %>
             <!-- Vote Button: Disabled -->
             <button class="ui disabled red label" data-inverted="" data-tooltip="Log In to Vote!"
                     data-position="right center" disabled>
                 Vote
-                <div class="detail"><%= poll.voteCount %></div>
+                <div id="vote-count" class="detail"><%= poll.voteCount %></div>
             </button>
         <% } %>
 

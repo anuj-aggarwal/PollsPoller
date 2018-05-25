@@ -7,7 +7,8 @@ const bp = require("body-parser");
 const cp = require("cookie-parser");
 const session = require("express-session");
 const httpStatusCodes = require("http-status-codes");
-
+const http = require("http");
+const socketIO = require("socket.io");
 
 //--------------------
 //    User Files
@@ -21,6 +22,10 @@ const Passport = require("./passport");
 //    INITIALIZATION
 //--------------------
 const app = express();
+// Extract Server
+const server = http.Server(app);
+// Initialize Socket.io
+const io = socketIO(server);
 
 
 //--------------------
@@ -61,7 +66,7 @@ app.use(function (req, res, next) {
 });
 
 // Routers
-app.use("/polls", require("./routes/poll")(express.Router()));
+app.use("/polls", require("./routes/poll")(express.Router(), io));
 app.use("/discussions", require("./routes/discussion"));
 app.use("/users", require("./routes/user"));
 app.use("/api", require("./routes/api"));
@@ -172,6 +177,6 @@ app.use((err, req, res, next) => {
 
 
 // Listen at specified Port
-app.listen(CONFIG.SERVER.PORT, () => {
+server.listen(CONFIG.SERVER.PORT, () => {
 	console.log(`Server started at http://${CONFIG.SERVER.HOST}:${CONFIG.SERVER.PORT}/`);
 });

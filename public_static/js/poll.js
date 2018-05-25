@@ -1,4 +1,9 @@
 $(() => {
+	// Connect to Socket
+	const socket = io();
+
+	const $voteCount = $("#vote-count");
+
 	$(".ui.radio.checkbox").checkbox();
 
 	const deleteErrorIcon = $("#delete-error-icon");
@@ -33,5 +38,10 @@ $(() => {
 				 deleteErrorIcon.show();
 			 });
 		}
+	});
+
+	// Event Listener for Vote Count
+	socket.on("vote count", voteCount => {
+		$voteCount.text(voteCount);
 	});
 });

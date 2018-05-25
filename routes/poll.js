@@ -10,7 +10,7 @@ const { checkLoggedIn } = require("../helpers");
 //       ROUTES
 //--------------------
 
-module.exports = route => {
+module.exports = (route, io) => {
 	// GET Route for a page of all polls
 	route.get("/", (req, res, next) => {
 
@@ -177,7 +177,12 @@ module.exports = route => {
 				}
 			})
 			// Redirect user to the poll's page
-			.then(poll => res.redirect(`/polls/${req.params.id}`))
+			.then(poll => {
+				// Emit new Vote Count
+				io.emit("vote count", poll.votes.length);
+				// Reload the page
+				res.redirect(`/polls/${req.params.id}`);
+			})
 			.catch(next);
 	});
 
