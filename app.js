@@ -61,7 +61,7 @@ app.use(function (req, res, next) {
 });
 
 // Routers
-app.use("/polls", require("./routes/poll"));
+app.use("/polls", require("./routes/poll")(express.Router()));
 app.use("/discussions", require("./routes/discussion"));
 app.use("/users", require("./routes/user"));
 app.use("/api", require("./routes/api"));
