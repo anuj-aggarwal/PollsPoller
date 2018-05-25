@@ -21,6 +21,8 @@ route.get("/:id/polls", checkLoggedIn, (req, res, next) => {
 		return next(err);
 	}
 
+	const DEFAULT_PER_PAGE = 10;
+
 	// Decide method for sorting(trending/recent/default)
 	// from query parameter "sort"
 	let sortBy;
@@ -41,7 +43,7 @@ route.get("/:id/polls", checkLoggedIn, (req, res, next) => {
 
 	// Find page, perPage and handle non-positive values
 	let page = Math.max(parseInt(req.query.page) || 1, 1);
-	let perPage = Math.max(parseInt(req.query.perPage) || 1, 1);
+	let perPage = Math.max(parseInt(req.query.perPage) || 1, DEFAULT_PER_PAGE);
 	let count;
 	let numPages;
 

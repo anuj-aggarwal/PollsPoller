@@ -13,6 +13,7 @@ const { checkLoggedIn } = require("../helpers");
 module.exports = (route, io) => {
 	// GET Route for a page of all polls
 	route.get("/", (req, res, next) => {
+		const DEFAULT_PER_PAGE = 10;
 
 		// Decide method for sorting(trending/recent/default)
 		// from query parameter "sort"
@@ -34,7 +35,7 @@ module.exports = (route, io) => {
 
 		// Find page, perPage and handle non-positive values
 		let page = Math.max(parseInt(req.query.page) || 1, 1);
-		let perPage = Math.max(parseInt(req.query.perPage) || 1, 1);
+		let perPage = Math.max(parseInt(req.query.perPage) || 1, DEFAULT_PER_PAGE);
 
 		let count;
 		let numPages;
