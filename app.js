@@ -9,6 +9,7 @@ const session = require("express-session");
 const httpStatusCodes = require("http-status-codes");
 const http = require("http");
 const socketIO = require("socket.io");
+const MongoStore = require("connect-mongo")(session);
 
 //--------------------
 //    User Files
@@ -16,6 +17,7 @@ const socketIO = require("socket.io");
 const CONFIG = require("./config");
 const models = require("./models");
 const Passport = require("./passport");
+const db = require("./models");
 
 
 //--------------------
@@ -45,7 +47,8 @@ app.use(cp(CONFIG.COOKIE_SECRET_KEY));
 app.use(session({
 	secret: CONFIG.SESSION_SECRET,
 	resave: false,
-	saveUninitialized: true
+	saveUninitialized: true,
+	store: new MongoStore({ mongooseConnection: db.mongoose.connection })
 }));
 
 // Initialize Passport

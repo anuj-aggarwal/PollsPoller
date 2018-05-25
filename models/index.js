@@ -27,4 +27,4 @@ mongoose.connect(`mongodb://${CONFIG.DB.HOST}:${CONFIG.DB.PORT}/${CONFIG.DB.NAME
 
 
 // Export all the Models
-module.exports = { User, Poll, Reply };
+module.exports = { User, Poll, Reply, mongoose };
