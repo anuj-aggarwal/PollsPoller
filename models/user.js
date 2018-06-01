@@ -10,7 +10,16 @@ const UserSchema = mongoose.Schema({
 	pollsCreated: [{
 		type: mongoose.Schema.Types.ObjectId,
 		ref: "poll"
-	}]
+	}],
+    resetPasswordToken: {
+		type: String,
+		default: undefined
+	},
+    resetPasswordExpires: {
+		type: String,
+		default: undefined
+    }
+
 }, {
 	usePushEach: true   // Use Mongo $pushEach instead of deprecated $pushAll
 });

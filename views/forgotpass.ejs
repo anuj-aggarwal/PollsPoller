@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Polls Poller</title>
+
+    <% include ./partials/header.ejs %>
+
+</head>
+<body>
+
+<!-- NAVBAR -->
+<% include ./partials/navbar.ejs %>
+
+<!-- MAIN Container -->
+<div id="main-container" class="ui grid container">
+    <div class="sixteen wide mobile eight wide computer column">
+        <div id="forgot-pass-container" class="ui container">
+            <!-- Heading -->
+            <h1 class="header">Forgot Password ?</h1>
+            <!-- Form -->
+            <form action="/forgot" method="post" class="ui form">
+                <div class="field">
+                    <label for="username">Username: </label>
+                    <input type="text" id="login-username" name="username" required>
+                </div>
+                <div class="field">
+                    <label for="email">E-Mail: </label>
+                    <input type="email" id="login-email" name="email" required>
+                </div>
+                <button class="ui primary button">Reset</button>
+            </form>    <!-- Form End -->
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
