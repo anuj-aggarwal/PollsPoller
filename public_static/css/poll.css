@@ -2,6 +2,11 @@
     max-width: 800px !important;
 }
 
+#tag {
+    display: inline-block;
+    float: right;
+}
+
 .header {
     overflow-wrap: break-word;
 }

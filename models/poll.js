@@ -26,10 +26,10 @@ const pollSchema = mongoose.Schema({
 		type: mongoose.Schema.Types.ObjectId,
 		ref: "reply"
 	}],
-	category: String,
 	pollType: String,
 	isPollOpen: Boolean,
-	isDiscussionOpen: Boolean
+	isDiscussionOpen: Boolean,
+	tags: [ String ]
 }, {
 	usePushEach: true,  // Use Mongo $pushEach instead of deprecated $pushAll
 	timestamps: { createdAt: "createdAt" }    // adds createdAt and updatedAt timestamps for sorting

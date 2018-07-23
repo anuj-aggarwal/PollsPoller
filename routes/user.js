@@ -61,7 +61,7 @@ route.get("/:id/polls", checkLoggedIn, (req, res, next) => {
 		      // Get all the polls with question, createdAt and voteCount only
 		      return models.Poll.find({
 			      author: req.params.id
-		      }, "question createdAt voteCount")
+		      }, "question createdAt voteCount tags")
 		      // Sort the polls according to sorting method
 		                   .sort({ [sortBy]: "descending" })
 		                   // Skip and limit to get

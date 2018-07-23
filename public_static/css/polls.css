@@ -5,3 +5,12 @@ a:hover {
 #pagination .item:not(.disabled):hover {
     color: blue;
 }
+
+#tags {
+    margin-left: 1.5em;
+}
+
+#tag {
+    margin-right: 1em;
+    background-color: lightsteelblue;
+}

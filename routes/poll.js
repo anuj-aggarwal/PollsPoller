@@ -52,14 +52,14 @@ module.exports = (route, io) => {
 					page = numPages;
 
 				// Get all the polls with question, author and voteCount only
-				return models.Poll.find({}, "question author voteCount")
+				return models.Poll.find({}, "question author voteCount tags")
 				// Sort the polls according to sorting method
 							.sort({ [sortBy]: "descending" })
 							// Skip and limit to get desired range
 							.skip(perPage * (page - 1))
 							.limit(perPage)
 							// Populate the username of the author
-							.populate("author", "username");
+							.populate("author", "username")
 			})
 			// Send the Polls to user
 			.then(polls => {

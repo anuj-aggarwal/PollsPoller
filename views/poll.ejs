@@ -22,7 +22,7 @@
     <!-- Question and Author -->
     <h2 class="header"><%= poll.question %></h2>
     <p>By~ <%= poll.author.username %></p>
-
+    
     <!-- Vote Form with Options -->
     <form action="/polls/<%= poll._id %>/votes" method="post" class="ui form">
         <!-- Options List -->
@@ -70,6 +70,16 @@
             </button>
         <% } %>
 
+        <!-- Tags -->
+        <span id="tag">
+            <% poll.tags.forEach(tag=>{ %>
+                <% if(tag !== null) { %>
+                    <div class="ui small teal tag label">
+                        <%= tag %>
+                    </div>
+                <% } %>
+            <% }); %>
+        </span>
     </form>
 
     <!-- Link to Discussion -->

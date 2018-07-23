@@ -56,7 +56,8 @@ $(() => {
 			// Extract the options' texts from the Input List
 			options: $(".option").toArray().map(option => {
 				return $(option).text();
-			})
+			}),
+			tags: $("#tags").val()
 		})
 		 .then(data => {
 			 // Redirect to new Poll Page

@@ -14,6 +14,7 @@ const { checkAPILoggedIn } = require("../../helpers");
 
 // POST Route for Creating new Poll
 route.post("/", checkAPILoggedIn, (req, res, next) => {
+
 	if (!req.body.question || !req.body.options) {
 		let err = new Error("Poll Body Incomplete!!");
 		err.status = httpStatusCodes.BAD_REQUEST;
@@ -38,10 +39,13 @@ route.post("/", checkAPILoggedIn, (req, res, next) => {
 		}),
 		voteCount: 0,
 		isPollOpen: true,
-		isDiscussionOpen: true
+		isDiscussionOpen: true,
+		tags: req.body.tags.split(";").map(tag => tag.trim()).filter(tag => tag)
 	})
 	// Send the new Poll's Address to the User
-	      .then(poll => res.send(`/polls/${poll._id}`))
+	      .then(poll => {
+	      	res.send(`/polls/${poll._id}`);
+	      })
 	      .catch(next);
 });
 
